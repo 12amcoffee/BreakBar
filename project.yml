@@ -1,0 +1,36 @@
+# XcodeGen spec. Run `xcodegen` in this folder to produce BreakBar.xcodeproj.
+name: BreakBar
+options:
+  bundleIdPrefix: com.fnm945
+  deploymentTarget:
+    macOS: "13.0"
+packages:
+  BreakBarCore:
+    path: Core
+targets:
+  BreakBar:
+    type: application
+    platform: macOS
+    sources:
+      - App
+    dependencies:
+      - package: BreakBarCore
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: BreakBar
+        LSUIElement: true              # menu bar only, no Dock icon
+        LSApplicationCategoryType: public.app-category.productivity
+    entitlements:
+      path: App/BreakBar.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fnm945.BreakBar
+        SWIFT_VERSION: "5.9"
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "-"        # "Sign to Run Locally": no Apple developer account needed
+        ENABLE_HARDENED_RUNTIME: YES
