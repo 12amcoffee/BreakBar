@@ -65,6 +65,9 @@ brew tap 12amcoffee/breakbar
 brew install --cask breakbar
 ```
 
+Recent versions of Homebrew refuse to load casks from third-party taps until you trust them. If you
+see `Refusing to load cask ... from untrusted tap`, run `brew trust 12amcoffee/breakbar` once and install again.
+
 Releases are built by GitHub Actions (`.github/workflows/release.yml`) from a tag such as `v0.1.0`,
 never on a personal machine.
 

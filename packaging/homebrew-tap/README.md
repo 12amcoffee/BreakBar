@@ -13,6 +13,9 @@ brew tap 12amcoffee/breakbar
 brew install --cask breakbar
 ```
 
+Recent versions of Homebrew refuse to load casks from third-party taps until you trust them. If you
+see `Refusing to load cask ... from untrusted tap`, run `brew trust 12amcoffee/breakbar` once and install again.
+
 ## Releasing a new version
 
 1. Tag BreakBar (`git tag v0.2.0 && git push origin v0.2.0`). The workflow builds the zip, DMG and a
