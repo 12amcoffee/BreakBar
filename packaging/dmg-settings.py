@@ -9,22 +9,22 @@ background = defines.get("background")    # optional background image (PNG or mu
 app_name = os.path.basename(app)
 
 # --- Window: as big as the background image, so the artwork fills it exactly. -----------------
+# Design/dmg-background.png is 660x400 points; dmg-background@2x.png is the same art at 1320x800.
 WINDOW_W, WINDOW_H = 660, 400             # used when there is no background image
-if background:
+size_from = defines.get("size_from", background)   # the 1x image, even when `background` is a 2-in-1 TIFF
+if size_from:
     def sips(key):
-        out = subprocess.check_output(["sips", "-g", key, background]).decode().split()
+        out = subprocess.check_output(["sips", "-g", key, size_from]).decode().split()
         return int(out[-1])
     WINDOW_W, WINDOW_H = sips("pixelWidth"), sips("pixelHeight")
-    if defines.get("retina"):             # a 2x background: pixels are twice the points
-        WINDOW_W, WINDOW_H = WINDOW_W // 2, WINDOW_H // 2
 
-# --- Icon positions: the app on the left, the Applications shortcut on the right. -------------
-# These are the centres of the icons. Tune ICON_Y / the X fractions to line up with arrows or
-# drop zones drawn in the background artwork.
+# --- Icon positions (centres, in points) -------------------------------------------------------
+# The background draws an arrow at y=200 from x~219 to x~441, so the app sits to its left and the
+# Applications shortcut to its right, both on the arrow's centre line.
 ICON_SIZE = 128
-ICON_Y = int(defines.get("icon_y", WINDOW_H * 0.5))
-APP_X = int(defines.get("app_x", WINDOW_W * 0.27))
-APPS_X = int(defines.get("apps_x", WINDOW_W * 0.73))
+ICON_Y = int(defines.get("icon_y", WINDOW_H * 0.5))        # 200 for a 400pt window
+APP_X = int(defines.get("app_x", WINDOW_W * 0.182))        # 120 for a 660pt window
+APPS_X = int(defines.get("apps_x", WINDOW_W * 0.818))      # 540 for a 660pt window
 
 # --- dmgbuild settings ------------------------------------------------------------------------
 format = "UDZO"
