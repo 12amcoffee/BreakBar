@@ -15,11 +15,21 @@ fresh rewrite; no TomatoBar code, sounds or icons are used.
 
 ## Download
 
-Built apps are on the [Releases page](../../releases): unzip, drag **BreakBar.app** to Applications,
-then **right-click → Open** the first time. The app is not notarised by Apple, so macOS warns on first
-launch; if it says the app is damaged, run `xattr -dr com.apple.quarantine /Applications/BreakBar.app`.
-Each release has a `.sha256` file to check the download. Releases are built by GitHub Actions
-(`.github/workflows/release.yml`) from a tag such as `v0.1.0`, never on a personal machine.
+Built apps are on the [Releases page](../../releases). Each release has a **DMG** (open it and drag
+**BreakBar.app** to Applications) and a **zip**, plus a `.sha256` file to check the download.
+
+The app is not notarised by Apple, so macOS warns on first launch: **right-click → Open** once. If it
+says the app is damaged, run `xattr -dr com.apple.quarantine /Applications/BreakBar.app`.
+
+**Homebrew** (needs the tap from `packaging/homebrew-tap/README.md` to be set up):
+
+```bash
+brew tap 12amcoffee/breakbar
+brew install --cask breakbar
+```
+
+Releases are built by GitHub Actions (`.github/workflows/release.yml`) from a tag such as `v0.1.0`,
+never on a personal machine.
 
 ## Build, run, test
 

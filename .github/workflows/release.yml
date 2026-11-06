@@ -47,17 +47,42 @@ jobs:
           echo "home-directory paths embedded in the binary (expect only the CI runner):"
           strings -a "$APP/Contents/MacOS/BreakBar" | grep -oE "/Users/[A-Za-z0-9_.-]+" | sort -u || true
 
-      - name: Package
+      - name: Package zip and DMG
         run: |
-          ditto -c -k --sequesterRsrc --keepParent build/Build/Products/Release/BreakBar.app "BreakBar-$VERSION.zip"
-          shasum -a 256 "BreakBar-$VERSION.zip" | tee "BreakBar-$VERSION.zip.sha256"
+          APP=build/Build/Products/Release/BreakBar.app
+          ditto -c -k --sequesterRsrc --keepParent "$APP" "BreakBar-$VERSION.zip"
+
+          # DMG: the app plus a shortcut to Applications, for drag-and-drop install.
+          mkdir dmgroot
+          ditto "$APP" dmgroot/BreakBar.app
+          ln -s /Applications dmgroot/Applications
+          hdiutil create -volname "BreakBar" -srcfolder dmgroot -ov -format UDZO "BreakBar-$VERSION.dmg"
+
+          # Check the DMG opens and contains the app.
+          hdiutil attach "BreakBar-$VERSION.dmg" -mountpoint /tmp/breakbar-dmg -nobrowse -quiet
+          test -d /tmp/breakbar-dmg/BreakBar.app
+          hdiutil detach /tmp/breakbar-dmg -quiet
+
+          shasum -a 256 "BreakBar-$VERSION.zip" "BreakBar-$VERSION.dmg" | tee "BreakBar-$VERSION.sha256"
+
+      - name: Generate Homebrew cask file
+        run: |
+          APP=build/Build/Products/Release/BreakBar.app
+          BUNDLE_ID=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$APP/Contents/Info.plist")
+          SHA=$(shasum -a 256 "BreakBar-$VERSION.zip" | cut -d' ' -f1)
+          sed -e "s|@VERSION@|$VERSION|g" -e "s|@SHA256@|$SHA|g" \
+              -e "s|@REPO@|$GITHUB_REPOSITORY|g" -e "s|@BUNDLE_ID@|$BUNDLE_ID|g" \
+              packaging/breakbar.rb.template > breakbar.rb
+          cat breakbar.rb
 
       - uses: actions/upload-artifact@v4
         with:
           name: BreakBar-${{ env.VERSION }}
           path: |
-            BreakBar-*.zip
-            BreakBar-*.zip.sha256
+            BreakBar-${{ env.VERSION }}.zip
+            BreakBar-${{ env.VERSION }}.dmg
+            BreakBar-${{ env.VERSION }}.sha256
+            breakbar.rb
 
       - name: Publish GitHub Release
         if: github.ref_type == 'tag'
@@ -65,11 +90,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cat > notes.md <<'NOTES'
-          **Install:** unzip, drag `BreakBar.app` to Applications, then **right-click → Open** the first time.
-          The app is not notarised by Apple, so macOS warns about it on first launch. If it says the app is
-          damaged, run: `xattr -dr com.apple.quarantine /Applications/BreakBar.app`
-          Requires macOS 13 or later. Runs on Apple silicon and Intel.
+          **Install:** open the `.dmg` and drag `BreakBar.app` to Applications (or unzip the `.zip`), then
+          **right-click → Open** the first time. The app is not notarised by Apple, so macOS warns about it
+          on first launch. If it says the app is damaged, run:
+          `xattr -dr com.apple.quarantine /Applications/BreakBar.app`
+
+          Requires macOS 13 or later. Runs on Apple silicon and Intel. `breakbar.rb` is the Homebrew cask file.
           NOTES
           FLAGS=""; [[ "$VERSION" == *-* ]] && FLAGS="--prerelease"
-          gh release create "$GITHUB_REF_NAME" BreakBar-*.zip BreakBar-*.zip.sha256 \
+          gh release create "$GITHUB_REF_NAME" \
+            "BreakBar-$VERSION.zip" "BreakBar-$VERSION.dmg" "BreakBar-$VERSION.sha256" breakbar.rb \
             --title "BreakBar $VERSION" --notes-file notes.md --generate-notes $FLAGS

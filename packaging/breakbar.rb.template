@@ -1,0 +1,33 @@
+# Homebrew cask for BreakBar. The release workflow fills in the @PLACEHOLDERS@ and attaches the
+# result to each GitHub Release as breakbar.rb. Copy it into your tap as Casks/breakbar.rb.
+cask "breakbar" do
+  version "@VERSION@"
+  sha256 "@SHA256@"
+
+  url "https://github.com/@REPO@/releases/download/v#{version}/BreakBar-#{version}.zip"
+  name "BreakBar"
+  desc "Menu bar Pomodoro timer with a Rest window"
+  homepage "https://github.com/@REPO@"
+
+  livecheck do
+    url :url
+    strategy :github_latest
+  end
+
+  depends_on macos: ">= :ventura"
+
+  app "BreakBar.app"
+
+  # BreakBar is not notarised by Apple. Removing the quarantine flag lets it open without the
+  # "unidentified developer" warning. Delete this block if you would rather keep the warning.
+  postflight do
+    system_command "/usr/bin/xattr",
+                   args: ["-dr", "com.apple.quarantine", "#{appdir}/BreakBar.app"]
+  end
+
+  zap trash: [
+    "~/Library/Application Support/BreakBar",
+    "~/Library/Containers/@BUNDLE_ID@",
+    "~/Library/Preferences/@BUNDLE_ID@.plist",
+  ]
+end
