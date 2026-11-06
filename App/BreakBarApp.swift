@@ -15,6 +15,7 @@ struct BreakBarApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var effects: EffectsHandler?
     private var hotkeys: HotkeyManager?
+    private var prompts: PromptPresenter?
     private var statusItemController: StatusItemController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -22,7 +23,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let effects = EffectsHandler(controller: controller)
         self.effects = effects
         hotkeys = HotkeyManager(controller: controller)
-        statusItemController = StatusItemController(controller: controller, effects: effects)
+        let prompts = PromptPresenter(controller: controller)
+        self.prompts = prompts
+        statusItemController = StatusItemController(controller: controller, effects: effects, prompts: prompts)
     }
 
     /// `open breakbar://startRest` etc. (see URLCommand for the full list)

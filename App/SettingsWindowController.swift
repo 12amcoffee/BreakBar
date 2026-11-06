@@ -7,16 +7,18 @@ import SwiftUI
 final class SettingsWindowController {
     private let controller: TimerController
     private let effects: EffectsHandler
+    private let prompts: PromptPresenter
     private var window: NSWindow?
 
-    init(controller: TimerController, effects: EffectsHandler) {
+    init(controller: TimerController, effects: EffectsHandler, prompts: PromptPresenter) {
         self.controller = controller
         self.effects = effects
+        self.prompts = prompts
     }
 
     func show() {
         if window == nil {
-            let w = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(controller: controller, effects: effects)))
+            let w = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(controller: controller, effects: effects, preview: { [prompts] in prompts.showPreview($0) })))
             w.title = String(localized: "Settings")
             w.styleMask = [.titled, .closable]
             w.isReleasedWhenClosed = false

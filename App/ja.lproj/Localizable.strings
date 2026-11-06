@@ -52,7 +52,6 @@
 "Maximised floating window" = "最大化フローティングウィンドウ";
 "Full-screen overlay" = "全画面オーバーレイ";
 "Notification-style banner" = "通知スタイルのバナー";
-"Used for both the Rest and Start working windows." = "「休憩」と「作業開始」の両方のウィンドウに使われます。";
 "Show timer in menu bar" = "メニューバーにタイマーを表示";
 "Launch at login" = "ログイン時に起動";
 "Idle" = "待機中";
@@ -75,3 +74,10 @@
 "It's time for a long break!" = "長い休憩の時間です！";
 "Break is over" = "休憩は終わりです";
 "Keep up the good work!" = "この調子で頑張りましょう！";
+"Rest" = "休憩";
+"Resting" = "休憩中";
+"Close" = "閉じる";
+"Close (Esc)" = "閉じる (Esc)";
+"Hide" = "隠す";
+"Preview" = "プレビュー";
+"Used for both the Rest and Start working windows. Esc or Close always dismisses a window." = "「休憩」と「作業開始」の両方のウィンドウに使われます。Esc または「閉じる」でいつでも閉じられます。";

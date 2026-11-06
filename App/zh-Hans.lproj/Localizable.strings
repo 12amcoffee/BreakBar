@@ -52,7 +52,6 @@
 "Maximised floating window" = "最大化浮动窗口";
 "Full-screen overlay" = "全屏覆盖";
 "Notification-style banner" = "通知样式横幅";
-"Used for both the Rest and Start working windows." = "同时用于“休息”和“开始工作”窗口。";
 "Show timer in menu bar" = "在菜单栏显示计时";
 "Launch at login" = "登录时启动";
 "Idle" = "空闲";
@@ -75,3 +74,10 @@
 "It's time for a long break!" = "该长休息了！";
 "Break is over" = "休息结束";
 "Keep up the good work!" = "继续加油！";
+"Rest" = "休息";
+"Resting" = "休息中";
+"Close" = "关闭";
+"Close (Esc)" = "关闭 (Esc)";
+"Hide" = "隐藏";
+"Preview" = "预览";
+"Used for both the Rest and Start working windows. Esc or Close always dismisses a window." = "同时用于“休息”和“开始工作”窗口。按 Esc 或点击“关闭”随时可关闭窗口。";

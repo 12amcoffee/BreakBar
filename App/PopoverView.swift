@@ -15,7 +15,7 @@ struct PopoverView: View {
         VStack(alignment: .leading, spacing: 10) {
             mainButton
 
-            progressText
+            progressText(machine.sessionProgress)
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity)
@@ -75,16 +75,6 @@ struct PopoverView: View {
         else if machine.state == .idle { Text("Start") }
         else if hoveringMainButton { Text("Stop") }
         else { Text(verbatim: machine.menuBarTitle(at: controller.now) ?? "") }
-    }
-
-    private var progressText: Text {
-        switch machine.sessionProgress {
-        case .session(let current, let n): return Text("Session \(current) of \(n)")
-        case .done(let done, let n, let longNext):
-            return longNext ? Text("\(done) of \(n) done · long break next") : Text("\(done) of \(n) done")
-        case .longBreak: return Text("Long break")
-        case .longBreakAfterThisSession: return Text("Long break after this session")
-        }
     }
 
     // MARK: Contextual actions

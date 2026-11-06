@@ -52,7 +52,6 @@
 "Maximised floating window" = "Maximised floating window";
 "Full-screen overlay" = "Full-screen overlay";
 "Notification-style banner" = "Notification-style banner";
-"Used for both the Rest and Start working windows." = "Used for both the Rest and Start working windows.";
 "Show timer in menu bar" = "Show timer in menu bar";
 "Launch at login" = "Launch at login";
 "Idle" = "Idle";
@@ -75,3 +74,10 @@
 "It's time for a long break!" = "It's time for a long break!";
 "Break is over" = "Break is over";
 "Keep up the good work!" = "Keep up the good work!";
+"Rest" = "Rest";
+"Resting" = "Resting";
+"Close" = "Close";
+"Close (Esc)" = "Close (Esc)";
+"Hide" = "Hide";
+"Preview" = "Preview";
+"Used for both the Rest and Start working windows. Esc or Close always dismisses a window." = "Used for both the Rest and Start working windows. Esc or Close always dismisses a window.";

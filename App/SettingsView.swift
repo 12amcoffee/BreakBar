@@ -7,6 +7,7 @@ import BreakBarCore
 struct SettingsView: View {
     @ObservedObject var controller: TimerController
     let effects: EffectsHandler
+    let preview: (WindowStyle) -> Void
 
     var body: some View {
         TabView {
@@ -14,7 +15,7 @@ struct SettingsView: View {
                 .tabItem { Label("Intervals", systemImage: "clock") }
             BreaksTab(controller: controller)
                 .tabItem { Label("Breaks", systemImage: "cup.and.saucer") }
-            WindowsTab(controller: controller)
+            WindowsTab(controller: controller, preview: preview)
                 .tabItem { Label("Windows", systemImage: "macwindow") }
             SoundsTab(controller: controller, effects: effects)
                 .tabItem { Label("Sounds", systemImage: "speaker.wave.2") }
@@ -129,18 +130,29 @@ private struct BreaksTab: View {
 
 private struct WindowsTab: View {
     @ObservedObject var controller: TimerController
+    let preview: (WindowStyle) -> Void
 
     var body: some View {
         Form {
-            Section {
-                Picker("Window style", selection: controller.binding(\.windowStyle)) {
-                    ForEach(WindowStyle.allCases, id: \.self) { Text($0.title).tag($0) }
+            Section("Window style") {
+                ForEach(WindowStyle.allCases, id: \.self) { style in
+                    HStack {
+                        Button {
+                            controller.settings.windowStyle = style
+                        } label: {
+                            HStack {
+                                Image(systemName: controller.settings.windowStyle == style ? "largecircle.fill.circle" : "circle")
+                                Text(style.title)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        Spacer()
+                        Button("Preview") { preview(style) }
+                    }
                 }
-                .pickerStyle(.radioGroup)
-                Text("Used for both the Rest and Start working windows.")
+                Text("Used for both the Rest and Start working windows. Esc or Close always dismisses a window.")
                     .font(.caption).foregroundStyle(.secondary)
             }
-            // Preview buttons for each style are added together with the windows themselves.
         }
         .formStyle(.grouped)
     }
