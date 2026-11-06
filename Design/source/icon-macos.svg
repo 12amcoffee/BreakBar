@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+<defs><filter id="sh" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000" flood-opacity="0.28"/></filter></defs>
+<rect x="100.0" y="100.0" width="824" height="824" rx="184.3288" fill="#E5432B" filter="url(#sh)"/>
+<rect x="223.60000000000002" y="446.08" width="432.6" height="131.84" rx="65.92" fill="#FFF4E6"/>
+<rect x="705.64" y="446.08" width="94.76" height="131.84" rx="47.38" fill="#FFC9BB"/>
+</svg>

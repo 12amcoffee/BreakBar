@@ -48,6 +48,7 @@ struct PopoverView: View {
         }
         .padding(12)
         .frame(width: 260)
+        .tint(.tomato)
     }
 
     // MARK: Main button
@@ -64,6 +65,7 @@ struct PopoverView: View {
                 .font(.system(.body).monospacedDigit())
                 .frame(maxWidth: .infinity)
         }
+        .buttonStyle(.borderedProminent)
         .controlSize(.large)
         .keyboardShortcut(.defaultAction)
         .onHover { hoveringMainButton = $0 }

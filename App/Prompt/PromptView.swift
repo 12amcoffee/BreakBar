@@ -10,6 +10,10 @@ struct PromptView: View {
     private var h: PromptHandlers { model.handlers }
 
     var body: some View {
+        content.tint(.tomato)
+    }
+
+    @ViewBuilder private var content: some View {
         switch style {
         case .banner:
             banner

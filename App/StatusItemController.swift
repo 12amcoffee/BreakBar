@@ -45,8 +45,15 @@ final class StatusItemController: NSObject {
 
     private func refresh(_ machine: TimerMachine, _ now: Date) {
         guard let button = statusItem.button else { return }
-        let symbol = Self.symbolName(machine.icon)
-        button.image = NSImage(systemSymbolName: symbol, accessibilityDescription: machine.icon.accessibilityLabel)
+        if machine.icon == .idle, let glyph = NSImage(named: "MenuBarIcon") {
+            // The BreakBar glyph (a template image, so macOS tints it for light and dark menu bars).
+            glyph.isTemplate = true
+            glyph.accessibilityDescription = machine.icon.accessibilityLabel
+            button.image = glyph
+        } else {
+            let symbol = Self.symbolName(machine.icon)
+            button.image = NSImage(systemSymbolName: symbol, accessibilityDescription: machine.icon.accessibilityLabel)
+        }
 
         if machine.settings.showTimerInMenuBar, let title = machine.menuBarTitle(at: now) {
             button.attributedTitle = NSAttributedString(string: " " + title, attributes: [.font: Self.digitFont])
@@ -66,7 +73,7 @@ final class StatusItemController: NSObject {
 
     static func symbolName(_ icon: MenuBarIcon) -> String {
         switch icon {
-        case .idle: return "timer"
+        case .idle: return "timer"        // fallback only; idle normally uses the MenuBarIcon glyph
         case .working: return "hourglass"
         case .paused: return "pause.circle.fill"
         case .waitingToRest: return "bell.fill"

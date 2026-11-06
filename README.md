@@ -42,6 +42,8 @@ Core/    Swift package, no UI: settings, state machine, formatting, URL commands
 App/     the macOS app: menu bar, popover, Settings, windows, sounds, notifications, hotkeys
   Prompt/  the Rest / Start working windows (4 styles)
   *.lproj  English, Chinese (Simplified), Japanese strings
+  Assets.xcassets  app icon, menu bar glyph (template image), accent colour
+Design/  logo masters and editable SVG sources (tomato #E5432B, cream #FFF4E6)
 scripts/ make-sounds.py (synthesises the sounds), check-strings.py
 project.yml  XcodeGen spec
 ```

@@ -26,13 +26,7 @@ struct SettingsView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // A plain segmented control instead of TabView: same look on every macOS version.
-            Picker("", selection: $tab) {
-                ForEach(SettingsTab.allCases, id: \.self) { Text($0.title).tag($0) }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .padding([.horizontal, .top], 16)
+            tabBar
 
             switch tab {
             case .intervals: IntervalsTab(controller: controller)
@@ -43,6 +37,29 @@ struct SettingsView: View {
             }
         }
         .frame(width: 460, height: 460)
+        .tint(.tomato)
+    }
+
+    /// Our own tab bar so the selected tab can use the brand colour.
+    private var tabBar: some View {
+        HStack(spacing: 4) {
+            ForEach(SettingsTab.allCases, id: \.self) { item in
+                Button { tab = item } label: {
+                    Text(item.title)
+                        .font(.callout.weight(.medium))
+                        .padding(.vertical, 5)
+                        .frame(maxWidth: .infinity)
+                        .background(tab == item ? Color.tomato : Color.clear, in: RoundedRectangle(cornerRadius: 7))
+                        .foregroundStyle(tab == item ? Color.cream : Color.primary)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(tab == item ? .isSelected : [])
+            }
+        }
+        .padding(3)
+        .background(Color.primary.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+        .padding([.horizontal, .top], 16)
     }
 }
 
@@ -162,6 +179,7 @@ private struct WindowsTab: View {
                         } label: {
                             HStack {
                                 Image(systemName: controller.settings.windowStyle == style ? "largecircle.fill.circle" : "circle")
+                                    .foregroundStyle(controller.settings.windowStyle == style ? Color.tomato : Color.secondary)
                                 Text(style.title)
                             }
                         }
