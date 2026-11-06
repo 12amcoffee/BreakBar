@@ -1,8 +1,32 @@
-# BreakBar
+<p align="center">
+  <img src="Design/logo.png" alt="BreakBar logo" width="128" height="128">
+</p>
+
+<h1 align="center">BreakBar</h1>
 
 A macOS menu bar Pomodoro timer with fully custom intervals (I use 45 / 10) and a
 **Rest window**: when work ends, a window says "Rest" and the rest timer only starts when you
 click **Start resting**.
+
+## Why I made this
+
+I made BreakBar because of one very normal study session. I was in the library, doing problem sets
+on paper, with no earbuds in, and I was using a Pomodoro timer to stay on track. Most timers just
+play a sound when your work block ends, which is no good when you're trying to be quiet in a library
+(or you just don't have headphones on). The timer I'd been using showed a proper "Rest" screen when
+it was time for a break, and I loved that. But on its free version I couldn't set my own work and
+rest lengths, and I like 45 minutes of work and a 10 minute break.
+
+So I switched to TomatoBar, which is free and lets you customise everything. The catch is that it
+never tells you a break has started. You have to keep glancing at the menu bar icon, and since it
+runs in a continuous cycle, I kept losing track of whether I'd already missed my break and was just
+studying straight through. If you've ever looked up at 3pm and realised you haven't rested in two
+hours, you know the feeling.
+
+BreakBar is the app I wanted: TomatoBar's freedom to set your own times, plus a Rest window that
+pops up and waits for you. Your break only starts when you click **Start resting**, so you
+never lose track of it. It's free, and I hope it helps you study better, whether that's for exams,
+assignments, or just getting through a reading list.
 
 Inspired by [TomatoBar](https://github.com/ivoronin/TomatoBar) by Ilya Voronin (MIT). BreakBar is a
 fresh rewrite; no TomatoBar code, sounds or icons are used.
@@ -64,7 +88,8 @@ App/     the macOS app: menu bar, popover, Settings, windows, sounds, notificati
   Prompt/  the Rest / Start working windows (4 styles)
   *.lproj  English, Chinese (Simplified), Japanese strings
   Assets.xcassets  app icon, menu bar glyph (template image), accent colour
-Design/  logo masters and editable SVG sources (tomato #E5432B, cream #FFF4E6)
+Design/  logo, masters and editable SVG sources (tomato #E5432B, cream #FFF4E6)
+packaging/  Homebrew cask template, DMG layout settings
 scripts/ make-sounds.py (synthesises the sounds), check-strings.py
 project.yml  XcodeGen spec
 ```
@@ -180,8 +205,8 @@ System notifications are only sent when no window says the same thing (e.g. auto
 | Popover Start/Stop, "Stop" on hover | ✅ | ✅ |
 | Custom work / short / long durations | 1–60 | 1–180 |
 | Sessions per set before long break | 1–10 | 1–12 |
-| Stop after break | ✅ | ✅ ("When rest ends: Stop the timer") |
-| Sounds with volume | windup / ding / ticking | same three, own recordings, quiet by default |
+| Stop after break | ✅ | ✅ |
+| Sounds with volume | windup / ding / ticking | windup / ding / ticking |
 | Notifications, Skip action | ✅ | ✅ |
 | Global hotkey | ✅ | ✅ + second "answer window" hotkey |
 | Launch at login | ✅ | ✅ |

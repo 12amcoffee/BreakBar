@@ -52,11 +52,19 @@ jobs:
           APP=build/Build/Products/Release/BreakBar.app
           ditto -c -k --sequesterRsrc --keepParent "$APP" "BreakBar-$VERSION.zip"
 
-          # DMG: the app plus a shortcut to Applications, for drag-and-drop install.
-          mkdir dmgroot
-          ditto "$APP" dmgroot/BreakBar.app
-          ln -s /Applications dmgroot/Applications
-          hdiutil create -volname "BreakBar" -srcfolder dmgroot -ov -format UDZO "BreakBar-$VERSION.dmg"
+          # DMG: the app plus a shortcut to Applications, with our background and icon layout.
+          # dmgbuild (in a throwaway virtual environment) writes the Finder layout without needing Finder.
+          python3 -m venv .dmgvenv
+          .dmgvenv/bin/pip install --quiet dmgbuild==1.6.1
+          BG_ARGS=()
+          if [[ -f Design/dmg-background@2x.png && -f Design/dmg-background.png ]]; then
+            # Retina: combine the 1x and 2x images into one multi-resolution TIFF.
+            tiffutil -cathidpicheck Design/dmg-background.png Design/dmg-background@2x.png -out dmg-background.tiff
+            BG_ARGS=(-D background=dmg-background.tiff)
+          elif [[ -f Design/dmg-background.png ]]; then
+            BG_ARGS=(-D background=Design/dmg-background.png)
+          fi
+          .dmgvenv/bin/dmgbuild -s packaging/dmg-settings.py -D app="$APP" "${BG_ARGS[@]}" "BreakBar" "BreakBar-$VERSION.dmg"
 
           # Check the DMG opens and contains the app.
           hdiutil attach "BreakBar-$VERSION.dmg" -mountpoint /tmp/breakbar-dmg -nobrowse -quiet
