@@ -1,0 +1,24 @@
+name: ci
+on: [push, pull_request]
+
+jobs:
+  core-tests:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unit tests (core logic)
+        run: swift test --package-path Core
+
+  app-build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check translations
+        run: python3 scripts/check-strings.py
+      - name: Generate Xcode project
+        run: brew install xcodegen && xcodegen
+      - name: Build app (no signing)
+        run: |
+          xcodebuild build -project BreakBar.xcodeproj -scheme BreakBar -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" | tail -60
+          exit ${PIPESTATUS[0]}
