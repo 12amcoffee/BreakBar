@@ -41,9 +41,8 @@ fresh rewrite; no TomatoBar code, sounds or icons are used.
 
 ## Requirements
 
-- macOS 13 (Ventura) or later
-- Xcode 15 or later (free from the App Store)
-- [XcodeGen](https://github.com/yonaskolb/XcodeGen): `brew install xcodegen`
+macOS 13 (Ventura) or later, on Apple silicon or Intel. That's all you need to use BreakBar;
+no Xcode or developer tools are required to install it.
 
 ## Download
 
@@ -72,6 +71,10 @@ Releases are built by GitHub Actions (`.github/workflows/release.yml`) from a ta
 never on a personal machine.
 
 ## Build, run, test
+
+Only needed if you want to build BreakBar yourself or work on the code. You need Xcode 15 or later
+(free from the App Store) and [XcodeGen](https://github.com/yonaskolb/XcodeGen)
+(`brew install xcodegen`).
 
 ```bash
 xcodegen                      # creates BreakBar.xcodeproj from project.yml
