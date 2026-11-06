@@ -106,7 +106,12 @@ jobs:
 
           Requires macOS 13 or later. Runs on Apple silicon and Intel. `breakbar.rb` is the Homebrew cask file.
           NOTES
-          FLAGS=""; [[ "$VERSION" == *-* ]] && FLAGS="--prerelease"
-          gh release create "$GITHUB_REF_NAME" \
-            "BreakBar-$VERSION.zip" "BreakBar-$VERSION.dmg" "BreakBar-$VERSION.sha256" breakbar.rb \
-            --title "BreakBar $VERSION" --notes-file notes.md --generate-notes $FLAGS
+          FILES=("BreakBar-$VERSION.zip" "BreakBar-$VERSION.dmg" "BreakBar-$VERSION.sha256" breakbar.rb)
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            # You already created this release on the website: keep your title and notes, add the files.
+            gh release upload "$GITHUB_REF_NAME" "${FILES[@]}" --clobber
+          else
+            FLAGS=""; [[ "$VERSION" == *-* ]] && FLAGS="--prerelease"
+            gh release create "$GITHUB_REF_NAME" "${FILES[@]}" \
+              --title "BreakBar $VERSION" --notes-file notes.md --generate-notes $FLAGS
+          fi
