@@ -90,3 +90,25 @@ final class DisplayTests: XCTestCase {
         XCTAssertFalse(m.available.canSnooze)
     }
 }
+
+final class CommandAndNameTests: XCTestCase {
+    func testURLCommands() {
+        XCTAssertEqual(URLCommand(url: URL(string: "breakbar://startRest")!), .event(.startRest))
+        XCTAssertEqual(URLCommand(url: URL(string: "BreakBar://TOGGLE")!), .toggle)
+        XCTAssertEqual(URLCommand(url: URL(string: "breakbar://startStop")!), .toggle)
+        XCTAssertNil(URLCommand(url: URL(string: "breakbar://nonsense")!))
+        XCTAssertNil(URLCommand(url: URL(string: "other://start")!))
+    }
+
+    func testStateNames() {
+        XCTAssertEqual(TimerState.idle.name, "idle")
+        XCTAssertEqual(TimerState.resting(kind: .long, endsAt: Date()).name, "restingLong")
+    }
+
+    func testVolumesAreClampedAndDefaultsQuiet() {
+        var s = TimerSettings()
+        XCTAssertEqual(s.tickingVolume, 0); XCTAssertEqual(s.windupVolume, 0)
+        s.dingVolume = 7; s.tickingVolume = -1
+        XCTAssertEqual(s.clamped().dingVolume, 1); XCTAssertEqual(s.clamped().tickingVolume, 0)
+    }
+}

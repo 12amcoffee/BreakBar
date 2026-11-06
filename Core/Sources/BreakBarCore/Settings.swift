@@ -46,6 +46,12 @@ public struct TimerSettings: Codable, Equatable, Sendable {
     /// Idle/unanswered longer than this starts a fresh set.
     public var inactivityResetMinutes = 60
 
+    // Sounds (0 = off, 1 = full volume). Quiet by default: this app is meant for libraries.
+    public var windupVolume = 0.0
+    public var dingVolume = 0.5
+    public var tickingVolume = 0.0
+    public var notificationsEnabled = true
+
     // Presentation
     public var windowStyle = WindowStyle.small
     public var showTimerInMenuBar = true
@@ -72,6 +78,10 @@ public struct TimerSettings: Codable, Equatable, Sendable {
         maxSnoozesPerBreak = try c.decodeIfPresent(Int.self, forKey: .maxSnoozesPerBreak) ?? d.maxSnoozesPerBreak
         delayLongBreak = try c.decodeIfPresent(Bool.self, forKey: .delayLongBreak) ?? d.delayLongBreak
         inactivityResetMinutes = try c.decodeIfPresent(Int.self, forKey: .inactivityResetMinutes) ?? d.inactivityResetMinutes
+        windupVolume = try c.decodeIfPresent(Double.self, forKey: .windupVolume) ?? d.windupVolume
+        dingVolume = try c.decodeIfPresent(Double.self, forKey: .dingVolume) ?? d.dingVolume
+        tickingVolume = try c.decodeIfPresent(Double.self, forKey: .tickingVolume) ?? d.tickingVolume
+        notificationsEnabled = try c.decodeIfPresent(Bool.self, forKey: .notificationsEnabled) ?? d.notificationsEnabled
         windowStyle = try c.decodeIfPresent(WindowStyle.self, forKey: .windowStyle) ?? d.windowStyle
         showTimerInMenuBar = try c.decodeIfPresent(Bool.self, forKey: .showTimerInMenuBar) ?? d.showTimerInMenuBar
     }
@@ -91,6 +101,9 @@ public struct TimerSettings: Codable, Equatable, Sendable {
         s.snoozeMinutes = min(max(snoozeMinutes, 1), 60)
         s.maxSnoozesPerBreak = min(max(maxSnoozesPerBreak, 1), 20)
         s.inactivityResetMinutes = min(max(inactivityResetMinutes, 5), 1440)
+        s.windupVolume = min(max(windupVolume, 0), 1)
+        s.dingVolume = min(max(dingVolume, 0), 1)
+        s.tickingVolume = min(max(tickingVolume, 0), 1)
         return s
     }
 

@@ -61,3 +61,17 @@
 "Waiting to start rest" = "休憩の開始待ち";
 "Rest snoozed" = "休憩をスヌーズ中";
 "Waiting to start work" = "作業の開始待ち";
+"Sounds" = "サウンド";
+"Windup" = "ゼンマイ";
+"Ding" = "チン";
+"Ticking" = "チクタク";
+"Move a slider to hear the sound. Zero turns it off." = "スライダーを動かすと音を確認できます。0でオフになります。";
+"Show notifications" = "通知を表示";
+"Start / stop shortcut" = "開始 / 停止ショートカット";
+"Answer window shortcut" = "ウィンドウに応答するショートカット";
+"The answer shortcut presses \"Start resting\" or \"Start working\" for you." = "応答ショートカットは「休憩を始める」または「作業を始める」を代わりに押します。";
+"Time's up" = "時間です";
+"It's time for a short break!" = "短い休憩の時間です！";
+"It's time for a long break!" = "長い休憩の時間です！";
+"Break is over" = "休憩は終わりです";
+"Keep up the good work!" = "この調子で頑張りましょう！";

@@ -6,13 +6,17 @@ import SwiftUI
 @MainActor
 final class SettingsWindowController {
     private let controller: TimerController
+    private let effects: EffectsHandler
     private var window: NSWindow?
 
-    init(controller: TimerController) { self.controller = controller }
+    init(controller: TimerController, effects: EffectsHandler) {
+        self.controller = controller
+        self.effects = effects
+    }
 
     func show() {
         if window == nil {
-            let w = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(controller: controller)))
+            let w = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(controller: controller, effects: effects)))
             w.title = String(localized: "Settings")
             w.styleMask = [.titled, .closable]
             w.isReleasedWhenClosed = false

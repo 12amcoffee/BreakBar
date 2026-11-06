@@ -8,6 +8,9 @@ options:
 packages:
   BreakBarCore:
     path: Core
+  KeyboardShortcuts:
+    url: https://github.com/sindresorhus/KeyboardShortcuts
+    from: 2.0.0
 targets:
   BreakBar:
     type: application
@@ -16,11 +19,15 @@ targets:
       - App
     dependencies:
       - package: BreakBarCore
+      - package: KeyboardShortcuts
     info:
       path: App/Info.plist
       properties:
         CFBundleDisplayName: BreakBar
         CFBundleLocalizations: [en, zh-Hans, ja]
+        CFBundleURLTypes:
+          - CFBundleURLName: com.fnm945.BreakBar
+            CFBundleURLSchemes: [breakbar]
         LSUIElement: true              # menu bar only, no Dock icon
         LSApplicationCategoryType: public.app-category.productivity
     entitlements:

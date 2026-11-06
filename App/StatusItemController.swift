@@ -14,9 +14,9 @@ final class StatusItemController: NSObject {
 
     private static let digitFont = NSFont.monospacedDigitSystemFont(ofSize: 0, weight: .regular)
 
-    init(controller: TimerController) {
+    init(controller: TimerController, effects: EffectsHandler) {
         self.controller = controller
-        self.settingsWindow = SettingsWindowController(controller: controller)
+        self.settingsWindow = SettingsWindowController(controller: controller, effects: effects)
         super.init()
 
         popover.behavior = .transient

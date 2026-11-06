@@ -61,3 +61,17 @@
 "Waiting to start rest" = "Waiting to start rest";
 "Rest snoozed" = "Rest snoozed";
 "Waiting to start work" = "Waiting to start work";
+"Sounds" = "Sounds";
+"Windup" = "Windup";
+"Ding" = "Ding";
+"Ticking" = "Ticking";
+"Move a slider to hear the sound. Zero turns it off." = "Move a slider to hear the sound. Zero turns it off.";
+"Show notifications" = "Show notifications";
+"Start / stop shortcut" = "Start / stop shortcut";
+"Answer window shortcut" = "Answer window shortcut";
+"The answer shortcut presses \"Start resting\" or \"Start working\" for you." = "The answer shortcut presses \"Start resting\" or \"Start working\" for you.";
+"Time's up" = "Time's up";
+"It's time for a short break!" = "It's time for a short break!";
+"It's time for a long break!" = "It's time for a long break!";
+"Break is over" = "Break is over";
+"Keep up the good work!" = "Keep up the good work!";

@@ -41,3 +41,18 @@ public enum TimerEffect: Equatable, Sendable {
     case notifyRestStarted(RestKind)   // also sent when the Rest window appears
     case notifyRestEnded
 }
+
+extension TimerState {
+    /// Short stable name, used by the event log.
+    public var name: String {
+        switch self {
+        case .idle: return "idle"
+        case .working: return "working"
+        case .awaitingRest: return "awaitingRest"
+        case .snoozed: return "snoozed"
+        case .resting(let kind, _): return kind == .long ? "restingLong" : "resting"
+        case .awaitingWork: return "awaitingWork"
+        case .paused: return "paused"
+        }
+    }
+}

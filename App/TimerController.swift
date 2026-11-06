@@ -9,10 +9,14 @@ final class TimerController: ObservableObject {
     /// Updated every tick so views showing a countdown redraw.
     @Published private(set) var now = Date()
 
+    /// One instance for the whole app (the menu bar UI and the Shortcuts actions share it).
+    static let shared = TimerController()
+
     /// Called with the effects of each event (sounds and notifications are wired up here later).
     var onEffects: (([TimerEffect]) -> Void)?
 
     private let defaults: UserDefaults
+    private let log = EventLog()
     private var ticker: Timer?
 
     private enum Key {
@@ -48,7 +52,9 @@ final class TimerController: ObservableObject {
 
     func send(_ event: TimerEvent) {
         now = Date()
+        let before = machine.state
         let effects = machine.handle(event, at: now)
+        log.record(event: event, from: before, to: machine.state, completedSessions: machine.completedSessions, at: now)
         save()
         if !effects.isEmpty { onEffects?(effects) }
     }

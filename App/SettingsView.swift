@@ -1,10 +1,12 @@
 import SwiftUI
+import KeyboardShortcuts
 import ServiceManagement
 import BreakBarCore
 
 /// The Settings window content. Every control edits `controller.settings`, which saves immediately.
 struct SettingsView: View {
     @ObservedObject var controller: TimerController
+    let effects: EffectsHandler
 
     var body: some View {
         TabView {
@@ -14,6 +16,8 @@ struct SettingsView: View {
                 .tabItem { Label("Breaks", systemImage: "cup.and.saucer") }
             WindowsTab(controller: controller)
                 .tabItem { Label("Windows", systemImage: "macwindow") }
+            SoundsTab(controller: controller, effects: effects)
+                .tabItem { Label("Sounds", systemImage: "speaker.wave.2") }
             GeneralTab(controller: controller)
                 .tabItem { Label("General", systemImage: "gearshape") }
         }
@@ -142,6 +146,38 @@ private struct WindowsTab: View {
     }
 }
 
+private struct SoundsTab: View {
+    @ObservedObject var controller: TimerController
+    let effects: EffectsHandler
+
+    var body: some View {
+        Form {
+            Section {
+                row("Windup", \.windupVolume, .windup)
+                row("Ding", \.dingVolume, .ding)
+                row("Ticking", \.tickingVolume, .ticking)
+                Text("Move a slider to hear the sound. Zero turns it off.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            Section {
+                Toggle("Show notifications", isOn: controller.binding(\.notificationsEnabled))
+            }
+        }
+        .formStyle(.grouped)
+    }
+
+    private func row(_ title: LocalizedStringKey, _ keyPath: WritableKeyPath<TimerSettings, Double>,
+                     _ sound: SoundPlayer.PreviewSound) -> some View {
+        HStack {
+            Text(title)
+            Slider(value: controller.binding(keyPath), in: 0...1, onEditingChanged: { editing in
+                if !editing { effects.previewSound(sound) }      // play when the slider is released
+            })
+            .frame(width: 180)
+        }
+    }
+}
+
 private struct GeneralTab: View {
     @ObservedObject var controller: TimerController
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
@@ -149,6 +185,10 @@ private struct GeneralTab: View {
     var body: some View {
         Form {
             Toggle("Show timer in menu bar", isOn: controller.binding(\.showTimerInMenuBar))
+            KeyboardShortcuts.Recorder("Start / stop shortcut", name: .startStop)
+            KeyboardShortcuts.Recorder("Answer window shortcut", name: .answerPrompt)
+            Text("The answer shortcut presses \"Start resting\" or \"Start working\" for you.")
+                .font(.caption).foregroundStyle(.secondary)
             Toggle("Launch at login", isOn: $launchAtLogin)
                 .onChange(of: launchAtLogin) { enabled in
                     do {

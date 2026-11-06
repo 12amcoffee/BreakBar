@@ -61,3 +61,17 @@
 "Waiting to start rest" = "等待开始休息";
 "Rest snoozed" = "休息已推迟";
 "Waiting to start work" = "等待开始工作";
+"Sounds" = "声音";
+"Windup" = "上发条";
+"Ding" = "叮";
+"Ticking" = "滴答";
+"Move a slider to hear the sound. Zero turns it off." = "拖动滑块试听。设为零即关闭。";
+"Show notifications" = "显示通知";
+"Start / stop shortcut" = "开始 / 停止快捷键";
+"Answer window shortcut" = "回应窗口快捷键";
+"The answer shortcut presses \"Start resting\" or \"Start working\" for you." = "回应快捷键会替你点击“开始休息”或“开始工作”。";
+"Time's up" = "时间到";
+"It's time for a short break!" = "该短休息了！";
+"It's time for a long break!" = "该长休息了！";
+"Break is over" = "休息结束";
+"Keep up the good work!" = "继续加油！";
