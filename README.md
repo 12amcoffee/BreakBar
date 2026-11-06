@@ -8,6 +8,14 @@ A macOS menu bar Pomodoro timer with fully custom intervals (I use 45 / 10) and 
 **Rest window**: when work ends, a window says "Rest" and the rest timer only starts when you
 click **Start resting**.
 
+<p align="center">
+  <a href="https://github.com/12amcoffee/BreakBar/releases/latest/download/BreakBar.dmg"><b>⬇️ Download BreakBar for macOS</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/12amcoffee/BreakBar/releases/latest">All downloads</a>
+  <br>
+  <sub>macOS 13 or later · Apple silicon and Intel · free</sub>
+</p>
+
 ## Why I made this
 
 I made BreakBar because of one very normal study session. I was in the library, doing problem sets
@@ -39,8 +47,10 @@ fresh rewrite; no TomatoBar code, sounds or icons are used.
 
 ## Download
 
-Built apps are on the [Releases page](../../releases). Each release has a **DMG** (open it and drag
-**BreakBar.app** to Applications) and a **zip**, plus a `.sha256` file to check the download.
+Download the **DMG** from the button above (or the [Releases page](https://github.com/12amcoffee/BreakBar/releases/latest)),
+open it and drag **BreakBar.app** to Applications. On the release page, use the files under **Assets**
+(`BreakBar.dmg`, `BreakBar-x.y.z.zip`, `.sha256`); the "Source code" entries GitHub adds are only the
+code, for building it yourself.
 
 The app is not notarised by Apple, so macOS blocks it on first launch ("Apple could not verify…").
 Click **Done**, then open **System Settings → Privacy & Security**, scroll to **Security**, click

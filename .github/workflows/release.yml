@@ -52,6 +52,7 @@ jobs:
           APP=build/Build/Products/Release/BreakBar.app
           ditto -c -k --sequesterRsrc --keepParent "$APP" "BreakBar-$VERSION.zip"
 
+          # The DMG has a fixed name (BreakBar.dmg) so .../releases/latest/download/BreakBar.dmg always works.
           # DMG: the app plus a shortcut to Applications, with our background and icon layout.
           # dmgbuild (in a throwaway virtual environment) writes the Finder layout without needing Finder.
           python3 -m venv .dmgvenv
@@ -64,14 +65,14 @@ jobs:
           elif [[ -f Design/dmg-background.png ]]; then
             BG_ARGS=(-D background=Design/dmg-background.png)
           fi
-          .dmgvenv/bin/dmgbuild -s packaging/dmg-settings.py -D app="$APP" "${BG_ARGS[@]}" "BreakBar" "BreakBar-$VERSION.dmg"
+          .dmgvenv/bin/dmgbuild -s packaging/dmg-settings.py -D app="$APP" "${BG_ARGS[@]}" "BreakBar" "BreakBar.dmg"
 
           # Check the DMG opens and contains the app.
-          hdiutil attach "BreakBar-$VERSION.dmg" -mountpoint /tmp/breakbar-dmg -nobrowse -quiet
+          hdiutil attach "BreakBar.dmg" -mountpoint /tmp/breakbar-dmg -nobrowse -quiet
           test -d /tmp/breakbar-dmg/BreakBar.app
           hdiutil detach /tmp/breakbar-dmg -quiet
 
-          shasum -a 256 "BreakBar-$VERSION.zip" "BreakBar-$VERSION.dmg" | tee "BreakBar-$VERSION.sha256"
+          shasum -a 256 "BreakBar-$VERSION.zip" "BreakBar.dmg" | tee "BreakBar-$VERSION.sha256"
 
       - name: Generate Homebrew cask file
         run: |
@@ -88,7 +89,7 @@ jobs:
           name: BreakBar-${{ env.VERSION }}
           path: |
             BreakBar-${{ env.VERSION }}.zip
-            BreakBar-${{ env.VERSION }}.dmg
+            BreakBar.dmg
             BreakBar-${{ env.VERSION }}.sha256
             breakbar.rb
 
@@ -106,7 +107,7 @@ jobs:
 
           Requires macOS 13 or later. Runs on Apple silicon and Intel. `breakbar.rb` is the Homebrew cask file.
           NOTES
-          FILES=("BreakBar-$VERSION.zip" "BreakBar-$VERSION.dmg" "BreakBar-$VERSION.sha256" breakbar.rb)
+          FILES=("BreakBar-$VERSION.zip" "BreakBar.dmg" "BreakBar-$VERSION.sha256" breakbar.rb)
           if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
             # You already created this release on the website: keep your title and notes, add the files.
             gh release upload "$GITHUB_REF_NAME" "${FILES[@]}" --clobber
