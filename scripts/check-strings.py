@@ -28,7 +28,7 @@ for f in root.glob("*.swift"):
     for k in call.findall(f.read_text(encoding="utf-8")):
         k = re.sub(r'\\\(.*?\)', '%lld', k)           # \(value) -> %lld
         used.add(k)
-for k in sorted(used - base - {'%lld'}):          # a bare number needs no translation
+for k in sorted(used - base - {'%lld', ''}):      # a bare number or an empty (hidden) label needs no translation
     print(f"code uses {k!r} but no strings file defines it"); bad = True
 
 print("strings OK" if not bad else "strings have problems")

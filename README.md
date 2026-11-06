@@ -57,10 +57,10 @@ touches the screen, which is why it is fully unit-tested. The app turns state in
 | `idle` | nothing running | icon only |
 | `working(endsAt)` | work countdown | hourglass, `32:10` |
 | `awaitingRest(kind, since, snoozes)` | work done, Rest window waiting for **Start resting** | bell, `+01:23` (counts up) |
-| `snoozed(kind, until, snoozes)` | Snooze pressed, window returns at `until` | zzz, `z 01:45` |
+| `snoozed(kind, until, snoozes)` | Snooze pressed, window returns at `until` | zzz, `01:45` |
 | `resting(kind, endsAt)` | short or long rest countdown | cup / bed, `08:12` |
 | `awaitingWork(kind, since)` | rest done, Start working window waiting | bell badge, `+00:34` |
-| `paused(phase, remaining, since)` | work or rest paused | pause, `⏸ 44:00` |
+| `paused(phase, remaining, since)` | work or rest paused | pause, `44:00` |
 
 | From | Event | To | Notes |
 |---|---|---|---|

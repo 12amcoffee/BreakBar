@@ -35,14 +35,14 @@ final class DisplayTests: XCTestCase {
         var m = TimerMachine(); m.handle(.start, at: t0)
         let end = t0.addingTimeInterval(45 * 60); m.handle(.tick, at: end)
         m.handle(.snooze, at: end)
-        XCTAssertEqual(m.menuBarTitle(at: end.addingTimeInterval(15)), "z 01:45")
+        XCTAssertEqual(m.menuBarTitle(at: end.addingTimeInterval(15)), "01:45")
         XCTAssertEqual(m.icon, .snoozed)
     }
 
     func testPausedTitle() {
         var m = TimerMachine(); m.handle(.start, at: t0)
         m.handle(.pause, at: t0.addingTimeInterval(60))
-        XCTAssertEqual(m.menuBarTitle(at: t0.addingTimeInterval(500)), "⏸ 44:00")
+        XCTAssertEqual(m.menuBarTitle(at: t0.addingTimeInterval(500)), "44:00")
     }
 
     func testSessionProgress() {

@@ -45,6 +45,7 @@ extension TimerMachine {
 
     /// Text next to the menu bar icon. Countdowns round up so a fresh 45 min session reads 45:00.
     /// Waiting states count *up* with a "+" so they are distinct from a running countdown.
+    /// Snoozed and paused show a plain countdown; their icons say what state they are in.
     public func menuBarTitle(at now: Date) -> String? {
         func down(_ end: Date) -> String { formatClock(Int(end.timeIntervalSince(now).rounded(.up))) }
         func up(_ start: Date) -> String { "+" + formatClock(Int(now.timeIntervalSince(start))) }
@@ -52,8 +53,8 @@ extension TimerMachine {
         case .idle: return nil
         case .working(let end), .resting(_, let end): return down(end)
         case .awaitingRest(_, let since, _), .awaitingWork(_, let since): return up(since)
-        case .snoozed(_, let until, _): return "z " + down(until)
-        case .paused(_, let remaining, _): return "⏸ " + formatClock(Int(remaining.rounded(.up)))
+        case .snoozed(_, let until, _): return down(until)
+        case .paused(_, let remaining, _): return formatClock(Int(remaining.rounded(.up)))
         }
     }
 

@@ -3,26 +3,46 @@ import KeyboardShortcuts
 import ServiceManagement
 import BreakBarCore
 
+private enum SettingsTab: CaseIterable {
+    case intervals, breaks, windows, sounds, general
+
+    var title: LocalizedStringKey {
+        switch self {
+        case .intervals: return "Intervals"
+        case .breaks: return "Breaks"
+        case .windows: return "Windows"
+        case .sounds: return "Sounds"
+        case .general: return "General"
+        }
+    }
+}
+
 /// The Settings window content. Every control edits `controller.settings`, which saves immediately.
 struct SettingsView: View {
     @ObservedObject var controller: TimerController
     let effects: EffectsHandler
     let preview: (PromptWindowStyle) -> Void
+    @State private var tab = SettingsTab.intervals
 
     var body: some View {
-        TabView {
-            IntervalsTab(controller: controller)
-                .tabItem { Label("Intervals", systemImage: "clock") }
-            BreaksTab(controller: controller)
-                .tabItem { Label("Breaks", systemImage: "cup.and.saucer") }
-            WindowsTab(controller: controller, preview: preview)
-                .tabItem { Label("Windows", systemImage: "macwindow") }
-            SoundsTab(controller: controller, effects: effects)
-                .tabItem { Label("Sounds", systemImage: "speaker.wave.2") }
-            GeneralTab(controller: controller)
-                .tabItem { Label("General", systemImage: "gearshape") }
+        VStack(spacing: 0) {
+            // A plain segmented control instead of TabView: same look on every macOS version.
+            Picker("", selection: $tab) {
+                ForEach(SettingsTab.allCases, id: \.self) { Text($0.title).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .padding([.horizontal, .top], 16)
+
+            switch tab {
+            case .intervals: IntervalsTab(controller: controller)
+            case .breaks: BreaksTab(controller: controller)
+            case .windows: WindowsTab(controller: controller, preview: preview)
+            case .sounds: SoundsTab(controller: controller, effects: effects)
+            case .general: GeneralTab(controller: controller)
+            }
         }
-        .frame(width: 460, height: 440)
+        .frame(width: 460, height: 460)
     }
 }
 
@@ -180,12 +200,14 @@ private struct SoundsTab: View {
 
     private func row(_ title: LocalizedStringKey, _ keyPath: WritableKeyPath<TimerSettings, Double>,
                      _ sound: SoundPlayer.PreviewSound) -> some View {
-        HStack {
-            Text(title)
+        // LabeledContent lines every slider up, whatever the label's width.
+        LabeledContent {
             Slider(value: controller.binding(keyPath), in: 0...1, onEditingChanged: { editing in
                 if !editing { effects.previewSound(sound) }      // play when the slider is released
             })
-            .frame(width: 180)
+            .frame(width: 200)
+        } label: {
+            Text(title)
         }
     }
 }
