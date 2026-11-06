@@ -369,4 +369,13 @@ final class TimerMachineTests: XCTestCase {
         let back = try JSONDecoder().decode(TimerSettings.self, from: JSONEncoder().encode(s))
         XCTAssertEqual(s, back)
     }
+
+    func testOldOrPartialSettingsStillDecode() throws {
+        let partial = Data(#"{"workMinutes": 50, "snoozeEnabled": false}"#.utf8)
+        let s = try JSONDecoder().decode(TimerSettings.self, from: partial)
+        XCTAssertEqual(s.workMinutes, 50)
+        XCTAssertFalse(s.snoozeEnabled)
+        XCTAssertEqual(s.shortRestMinutes, 10)             // default filled in
+        XCTAssertEqual(try JSONDecoder().decode(TimerSettings.self, from: Data("{}".utf8)), TimerSettings())
+    }
 }

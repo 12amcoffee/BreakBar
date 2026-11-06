@@ -2,6 +2,7 @@
 name: BreakBar
 options:
   bundleIdPrefix: com.fnm945
+  developmentLanguage: en
   deploymentTarget:
     macOS: "13.0"
 packages:
@@ -19,6 +20,7 @@ targets:
       path: App/Info.plist
       properties:
         CFBundleDisplayName: BreakBar
+        CFBundleLocalizations: [en, zh-Hans, ja]
         LSUIElement: true              # menu bar only, no Dock icon
         LSApplicationCategoryType: public.app-category.productivity
     entitlements:

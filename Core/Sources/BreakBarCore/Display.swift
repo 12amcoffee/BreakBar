@@ -5,6 +5,14 @@ public enum MenuBarIcon: Equatable, Sendable {
     case idle, working, paused, waitingToRest, snoozed, shortRest, longRest, waitingToWork
 }
 
+/// What the "Session 2 of 4" line says, before translation.
+public enum SessionProgress: Equatable, Sendable {
+    case session(current: Int, of: Int)
+    case done(Int, of: Int, longBreakNext: Bool)
+    case longBreak
+    case longBreakAfterThisSession
+}
+
 /// Which buttons make sense right now. Shared by the popover and the Rest window.
 public struct AvailableActions: Equatable, Sendable {
     public var canPause = false
@@ -49,20 +57,15 @@ extension TimerMachine {
         }
     }
 
-    /// Progress toward the next long break, e.g. "Session 2 of 4".
-    public var sessionLabel: String {
+    /// Progress toward the next long break. The app turns this into translated text.
+    public var sessionProgress: SessionProgress {
         let n = settings.sessionsPerSet
-        func currentSession() -> String {
-            longBreakPostponed ? "Long break after this session" : "Session \(completedSessions + 1) of \(n)"
-        }
         switch state {
         case .idle, .working, .paused(.work, _, _):
-            return currentSession()
+            return longBreakPostponed ? .longBreakAfterThisSession : .session(current: completedSessions + 1, of: n)
         case .awaitingRest(let kind, _, _), .snoozed(let kind, _, _),
              .resting(let kind, _), .awaitingWork(let kind, _), .paused(.rest(let kind), _, _):
-            if kind == .long { return "Long break" }
-            let doneText = "\(completedSessions) of \(n) done"
-            return longBreakPostponed ? doneText + " · long break next" : doneText
+            return kind == .long ? .longBreak : .done(completedSessions, of: n, longBreakNext: longBreakPostponed)
         }
     }
 

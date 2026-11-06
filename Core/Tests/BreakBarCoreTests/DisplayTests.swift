@@ -45,27 +45,27 @@ final class DisplayTests: XCTestCase {
         XCTAssertEqual(m.menuBarTitle(at: t0.addingTimeInterval(500)), "⏸ 44:00")
     }
 
-    func testSessionLabelProgress() {
+    func testSessionProgress() {
         var m = TimerMachine()
-        XCTAssertEqual(m.sessionLabel, "Session 1 of 4")
+        XCTAssertEqual(m.sessionProgress, .session(current: 1, of: 4))
         m.handle(.start, at: t0); m.handle(.tick, at: t0.addingTimeInterval(45 * 60))
-        XCTAssertEqual(m.sessionLabel, "1 of 4 done")
+        XCTAssertEqual(m.sessionProgress, .done(1, of: 4, longBreakNext: false))
         m.handle(.skip, at: t0.addingTimeInterval(46 * 60))
-        XCTAssertEqual(m.sessionLabel, "Session 2 of 4")
+        XCTAssertEqual(m.sessionProgress, .session(current: 2, of: 4))
     }
 
-    func testSessionLabelLongBreakAndPostponed() {
+    func testSessionProgressLongBreakAndPostponed() {
         var s = TimerSettings(); s.sessionsPerSet = 1
         var m = TimerMachine(settings: s)
         m.handle(.start, at: t0); m.handle(.tick, at: t0.addingTimeInterval(45 * 60))
-        XCTAssertEqual(m.sessionLabel, "Long break")
+        XCTAssertEqual(m.sessionProgress, .longBreak)
 
         s.delayLongBreak = true
         var d = TimerMachine(settings: s)
         d.handle(.start, at: t0); d.handle(.tick, at: t0.addingTimeInterval(45 * 60))
-        XCTAssertEqual(d.sessionLabel, "1 of 1 done · long break next")
+        XCTAssertEqual(d.sessionProgress, .done(1, of: 1, longBreakNext: true))
         d.handle(.skip, at: t0.addingTimeInterval(46 * 60))
-        XCTAssertEqual(d.sessionLabel, "Long break after this session")
+        XCTAssertEqual(d.sessionProgress, .longBreakAfterThisSession)
     }
 
     func testAvailableActions() {

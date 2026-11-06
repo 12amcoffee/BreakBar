@@ -5,6 +5,7 @@ import BreakBarCore
 struct PopoverView: View {
     @ObservedObject var controller: TimerController
     let closePopover: () -> Void
+    let openSettings: () -> Void
     @State private var hoveringMainButton = false
 
     private var machine: TimerMachine { controller.machine }
@@ -14,7 +15,7 @@ struct PopoverView: View {
         VStack(alignment: .leading, spacing: 10) {
             mainButton
 
-            Text(machine.sessionLabel)
+            progressText
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity)
@@ -27,6 +28,13 @@ struct PopoverView: View {
                 .buttonStyle(.plain)
                 .disabled(machine.completedSessions == 0 && !machine.longBreakPostponed)
                 .help("Start counting sessions toward the next long break from zero")
+
+            Button("Settings…") {
+                closePopover()
+                openSettings()
+            }
+            .buttonStyle(.plain)
+            .keyboardShortcut(",")
 
             Button("About BreakBar") {
                 NSApp.activate(ignoringOtherApps: true)
@@ -52,7 +60,7 @@ struct PopoverView: View {
             else { controller.toggle() }
             closePopover()
         } label: {
-            Text(mainButtonTitle)
+            mainButtonLabel
                 .font(.system(.body).monospacedDigit())
                 .frame(maxWidth: .infinity)
         }
@@ -61,12 +69,22 @@ struct PopoverView: View {
         .onHover { hoveringMainButton = $0 }
     }
 
-    private var mainButtonTitle: String {
-        if actions.canStartRest { return "Start resting" }
-        if actions.canStartWork { return "Start working" }
-        if machine.state == .idle { return "Start" }
-        if hoveringMainButton { return "Stop" }
-        return machine.menuBarTitle(at: controller.now) ?? "Stop"
+    @ViewBuilder private var mainButtonLabel: some View {
+        if actions.canStartRest { Text("Start resting") }
+        else if actions.canStartWork { Text("Start working") }
+        else if machine.state == .idle { Text("Start") }
+        else if hoveringMainButton { Text("Stop") }
+        else { Text(verbatim: machine.menuBarTitle(at: controller.now) ?? "") }
+    }
+
+    private var progressText: Text {
+        switch machine.sessionProgress {
+        case .session(let current, let n): return Text("Session \(current) of \(n)")
+        case .done(let done, let n, let longNext):
+            return longNext ? Text("\(done) of \(n) done · long break next") : Text("\(done) of \(n) done")
+        case .longBreak: return Text("Long break")
+        case .longBreakAfterThisSession: return Text("Long break after this session")
+        }
     }
 
     // MARK: Contextual actions
@@ -78,14 +96,17 @@ struct PopoverView: View {
             if actions.canResume { Button("Resume") { controller.send(.resume) } }
             if actions.canSnooze { Button("Snooze \(s.snoozeMinutes) min") { controller.send(.snooze) } }
             if actions.canExtend { Button("+\(s.extendMinutes) min") { controller.send(.extend) } }
-            if actions.canSkip { Button(skipTitle) { controller.send(.skip) } }
+            if actions.canSkip { skipButton }
         }
         .controlSize(.small)
         .frame(maxWidth: .infinity)
     }
 
-    private var skipTitle: String {
-        if case .awaitingWork = machine.state { return "Skip" }
-        return "Skip rest"
+    @ViewBuilder private var skipButton: some View {
+        if case .awaitingWork = machine.state {
+            Button("Skip") { controller.send(.skip) }
+        } else {
+            Button("Skip rest") { controller.send(.skip) }
+        }
     }
 }

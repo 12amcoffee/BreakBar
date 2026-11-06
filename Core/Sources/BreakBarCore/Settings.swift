@@ -46,7 +46,35 @@ public struct TimerSettings: Codable, Equatable, Sendable {
     /// Idle/unanswered longer than this starts a fresh set.
     public var inactivityResetMinutes = 60
 
+    // Presentation
+    public var windowStyle = WindowStyle.small
+    public var showTimerInMenuBar = true
+
     public init() {}
+
+    /// Tolerant decoding: a missing key (older save, newer app) falls back to its default
+    /// instead of making the whole settings blob unreadable.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let d = TimerSettings()
+        workMinutes = try c.decodeIfPresent(Int.self, forKey: .workMinutes) ?? d.workMinutes
+        shortRestMinutes = try c.decodeIfPresent(Int.self, forKey: .shortRestMinutes) ?? d.shortRestMinutes
+        longRestMinutes = try c.decodeIfPresent(Int.self, forKey: .longRestMinutes) ?? d.longRestMinutes
+        sessionsPerSet = try c.decodeIfPresent(Int.self, forKey: .sessionsPerSet) ?? d.sessionsPerSet
+        whenWorkEnds = try c.decodeIfPresent(WhenWorkEnds.self, forKey: .whenWorkEnds) ?? d.whenWorkEnds
+        whenRestEnds = try c.decodeIfPresent(WhenRestEnds.self, forKey: .whenRestEnds) ?? d.whenRestEnds
+        continuousCycles = try c.decodeIfPresent(Bool.self, forKey: .continuousCycles) ?? d.continuousCycles
+        pauseEnabled = try c.decodeIfPresent(Bool.self, forKey: .pauseEnabled) ?? d.pauseEnabled
+        extendEnabled = try c.decodeIfPresent(Bool.self, forKey: .extendEnabled) ?? d.extendEnabled
+        extendMinutes = try c.decodeIfPresent(Int.self, forKey: .extendMinutes) ?? d.extendMinutes
+        snoozeEnabled = try c.decodeIfPresent(Bool.self, forKey: .snoozeEnabled) ?? d.snoozeEnabled
+        snoozeMinutes = try c.decodeIfPresent(Int.self, forKey: .snoozeMinutes) ?? d.snoozeMinutes
+        maxSnoozesPerBreak = try c.decodeIfPresent(Int.self, forKey: .maxSnoozesPerBreak) ?? d.maxSnoozesPerBreak
+        delayLongBreak = try c.decodeIfPresent(Bool.self, forKey: .delayLongBreak) ?? d.delayLongBreak
+        inactivityResetMinutes = try c.decodeIfPresent(Int.self, forKey: .inactivityResetMinutes) ?? d.inactivityResetMinutes
+        windowStyle = try c.decodeIfPresent(WindowStyle.self, forKey: .windowStyle) ?? d.windowStyle
+        showTimerInMenuBar = try c.decodeIfPresent(Bool.self, forKey: .showTimerInMenuBar) ?? d.showTimerInMenuBar
+    }
 
     public static let workRange = 1...180
     public static let restRange = 1...180

@@ -9,17 +9,23 @@ final class StatusItemController: NSObject {
     private let controller: TimerController
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let popover = NSPopover()
+    private let settingsWindow: SettingsWindowController
     private var cancellables = Set<AnyCancellable>()
 
     private static let digitFont = NSFont.monospacedDigitSystemFont(ofSize: 0, weight: .regular)
 
     init(controller: TimerController) {
         self.controller = controller
+        self.settingsWindow = SettingsWindowController(controller: controller)
         super.init()
 
         popover.behavior = .transient
         let hosting = NSHostingController(
-            rootView: PopoverView(controller: controller, closePopover: { [weak self] in self?.popover.performClose(nil) })
+            rootView: PopoverView(
+                controller: controller,
+                closePopover: { [weak self] in self?.popover.performClose(nil) },
+                openSettings: { [weak self] in self?.settingsWindow.show() }
+            )
         )
         hosting.sizingOptions = [.preferredContentSize]   // popover grows/shrinks with its content (macOS 13+)
         popover.contentViewController = hosting
@@ -42,8 +48,7 @@ final class StatusItemController: NSObject {
         let symbol = Self.symbolName(machine.icon)
         button.image = NSImage(systemSymbolName: symbol, accessibilityDescription: machine.icon.accessibilityLabel)
 
-        // "Show timer in menu bar" setting arrives in the Settings step; for now always show it.
-        if let title = machine.menuBarTitle(at: now) {
+        if machine.settings.showTimerInMenuBar, let title = machine.menuBarTitle(at: now) {
             button.attributedTitle = NSAttributedString(string: " " + title, attributes: [.font: Self.digitFont])
         } else {
             button.attributedTitle = NSAttributedString(string: "")
@@ -76,14 +81,14 @@ final class StatusItemController: NSObject {
 private extension MenuBarIcon {
     var accessibilityLabel: String {
         switch self {
-        case .idle: return "BreakBar, idle"
-        case .working: return "Working"
-        case .paused: return "Paused"
-        case .waitingToRest: return "Waiting to start rest"
-        case .snoozed: return "Rest snoozed"
-        case .shortRest: return "Short rest"
-        case .longRest: return "Long rest"
-        case .waitingToWork: return "Waiting to start work"
+        case .idle: return String(localized: "Idle")
+        case .working: return String(localized: "Working")
+        case .paused: return String(localized: "Paused")
+        case .waitingToRest: return String(localized: "Waiting to start rest")
+        case .snoozed: return String(localized: "Rest snoozed")
+        case .shortRest: return String(localized: "Short rest")
+        case .longRest: return String(localized: "Long rest")
+        case .waitingToWork: return String(localized: "Waiting to start work")
         }
     }
 }
