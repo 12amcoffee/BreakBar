@@ -13,6 +13,14 @@ fresh rewrite; no TomatoBar code, sounds or icons are used.
 - Xcode 15 or later (free from the App Store)
 - [XcodeGen](https://github.com/yonaskolb/XcodeGen): `brew install xcodegen`
 
+## Download
+
+Built apps are on the [Releases page](../../releases): unzip, drag **BreakBar.app** to Applications,
+then **right-click → Open** the first time. The app is not notarised by Apple, so macOS warns on first
+launch; if it says the app is damaged, run `xattr -dr com.apple.quarantine /Applications/BreakBar.app`.
+Each release has a `.sha256` file to check the download. Releases are built by GitHub Actions
+(`.github/workflows/release.yml`) from a tag such as `v0.1.0`, never on a personal machine.
+
 ## Build, run, test
 
 ```bash

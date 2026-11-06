@@ -1,0 +1,75 @@
+name: release
+
+# Builds the downloadable app on a clean GitHub Mac (so no personal paths end up inside it).
+#   - Push a tag like v0.1.0  -> builds, then publishes a GitHub Release with the zip.
+#   - "Run workflow" button   -> builds only; the zip is attached to the run as an artifact.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # needed to create the release
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Work out the version
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then V="${GITHUB_REF_NAME#v}"; else V="0.0.0-dev"; fi
+          echo "VERSION=$V" >> "$GITHUB_ENV"
+
+      - name: Unit tests (core logic)
+        run: swift test --package-path Core
+
+      - name: Check translations
+        run: python3 scripts/check-strings.py
+
+      - name: Generate Xcode project
+        run: brew install xcodegen && xcodegen
+
+      - name: Build universal Release app (Apple silicon + Intel)
+        run: |
+          xcodebuild build -project BreakBar.xcodeproj -scheme BreakBar -configuration Release \
+            -derivedDataPath build ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO \
+            MARKETING_VERSION="$VERSION" CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER"
+
+      - name: Verify the app
+        run: |
+          APP=build/Build/Products/Release/BreakBar.app
+          ARCHS_FOUND=$(lipo -archs "$APP/Contents/MacOS/BreakBar"); echo "architectures: $ARCHS_FOUND"
+          [[ "$ARCHS_FOUND" == *arm64* && "$ARCHS_FOUND" == *x86_64* ]]
+          codesign --verify --deep --strict "$APP"
+          codesign -d --entitlements - "$APP" 2>&1 | grep -q "com.apple.security.app-sandbox"
+          echo "home-directory paths embedded in the binary (expect only the CI runner):"
+          strings -a "$APP/Contents/MacOS/BreakBar" | grep -oE "/Users/[A-Za-z0-9_.-]+" | sort -u || true
+
+      - name: Package
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent build/Build/Products/Release/BreakBar.app "BreakBar-$VERSION.zip"
+          shasum -a 256 "BreakBar-$VERSION.zip" | tee "BreakBar-$VERSION.zip.sha256"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BreakBar-${{ env.VERSION }}
+          path: |
+            BreakBar-*.zip
+            BreakBar-*.zip.sha256
+
+      - name: Publish GitHub Release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > notes.md <<'NOTES'
+          **Install:** unzip, drag `BreakBar.app` to Applications, then **right-click → Open** the first time.
+          The app is not notarised by Apple, so macOS warns about it on first launch. If it says the app is
+          damaged, run: `xattr -dr com.apple.quarantine /Applications/BreakBar.app`
+          Requires macOS 13 or later. Runs on Apple silicon and Intel.
+          NOTES
+          FLAGS=""; [[ "$VERSION" == *-* ]] && FLAGS="--prerelease"
+          gh release create "$GITHUB_REF_NAME" BreakBar-*.zip BreakBar-*.zip.sha256 \
+            --title "BreakBar $VERSION" --notes-file notes.md --generate-notes $FLAGS
