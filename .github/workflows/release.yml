@@ -90,9 +90,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cat > notes.md <<'NOTES'
-          **Install:** open the `.dmg` and drag `BreakBar.app` to Applications (or unzip the `.zip`), then
-          **right-click → Open** the first time. The app is not notarised by Apple, so macOS warns about it
-          on first launch. If it says the app is damaged, run:
+          **Install:** open the `.dmg` and drag `BreakBar.app` to Applications (or unzip the `.zip`).
+          The app is not notarised by Apple, so macOS blocks it on first launch. Click **Done**, then open
+          **System Settings → Privacy & Security**, scroll to **Security**, click **Open Anyway** next to
+          "BreakBar.app was blocked", and confirm. Or run once in Terminal:
           `xattr -dr com.apple.quarantine /Applications/BreakBar.app`
 
           Requires macOS 13 or later. Runs on Apple silicon and Intel. `breakbar.rb` is the Homebrew cask file.

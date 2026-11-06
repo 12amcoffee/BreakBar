@@ -18,8 +18,11 @@ fresh rewrite; no TomatoBar code, sounds or icons are used.
 Built apps are on the [Releases page](../../releases). Each release has a **DMG** (open it and drag
 **BreakBar.app** to Applications) and a **zip**, plus a `.sha256` file to check the download.
 
-The app is not notarised by Apple, so macOS warns on first launch: **right-click → Open** once. If it
-says the app is damaged, run `xattr -dr com.apple.quarantine /Applications/BreakBar.app`.
+The app is not notarised by Apple, so macOS blocks it on first launch ("Apple could not verify…").
+Click **Done**, then open **System Settings → Privacy & Security**, scroll to **Security**, click
+**Open Anyway** next to "BreakBar.app was blocked", and confirm. (On macOS 14 and earlier,
+right-click → Open also works.) Or skip the prompt with one command:
+`xattr -dr com.apple.quarantine /Applications/BreakBar.app`.
 
 **Homebrew** (needs the tap from `packaging/homebrew-tap/README.md` to be set up):
 
