@@ -179,6 +179,10 @@ System notifications are only sent when no window says the same thing (e.g. auto
 | Continuous cycles (toggle) | (default) | ✅ |
 | Shortcuts actions | – | ✅ |
 
+## Licence
+
+MIT, see [LICENSE](LICENSE). Third-party notices (TomatoBar, KeyboardShortcuts) are in [NOTICE](NOTICE).
+
 ## Credits
 
 - Idea and feature set inspired by [TomatoBar](https://github.com/ivoronin/TomatoBar) (MIT, © Ilya Voronin) and the Flow app's Rest window.
