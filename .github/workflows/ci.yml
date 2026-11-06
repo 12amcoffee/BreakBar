@@ -3,14 +3,14 @@ on: [push, pull_request]
 
 jobs:
   core-tests:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - name: Unit tests (core logic)
         run: swift test --package-path Core
 
   app-build:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - name: Check translations
