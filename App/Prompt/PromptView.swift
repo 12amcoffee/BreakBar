@@ -4,7 +4,7 @@ import BreakBarCore
 /// The content of every Rest / Start working window. `style` only changes size and layout.
 struct PromptView: View {
     @ObservedObject var model: PromptModel
-    let style: WindowStyle
+    let style: PromptWindowStyle
 
     private var spec: PromptSpec { model.spec }
     private var h: PromptHandlers { model.handlers }

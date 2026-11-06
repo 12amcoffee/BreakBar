@@ -7,7 +7,7 @@ import BreakBarCore
 struct SettingsView: View {
     @ObservedObject var controller: TimerController
     let effects: EffectsHandler
-    let preview: (WindowStyle) -> Void
+    let preview: (PromptWindowStyle) -> Void
 
     var body: some View {
         TabView {
@@ -130,12 +130,12 @@ private struct BreaksTab: View {
 
 private struct WindowsTab: View {
     @ObservedObject var controller: TimerController
-    let preview: (WindowStyle) -> Void
+    let preview: (PromptWindowStyle) -> Void
 
     var body: some View {
         Form {
             Section("Window style") {
-                ForEach(WindowStyle.allCases, id: \.self) { style in
+                ForEach(PromptWindowStyle.allCases, id: \.self) { style in
                     HStack {
                         Button {
                             controller.settings.windowStyle = style
@@ -237,7 +237,7 @@ extension WhenRestEnds {
     }
 }
 
-extension WindowStyle {
+extension PromptWindowStyle {
     var title: LocalizedStringKey {
         switch self {
         case .small: return "Small floating window"

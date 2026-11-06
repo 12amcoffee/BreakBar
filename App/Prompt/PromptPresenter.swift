@@ -72,7 +72,7 @@ final class PromptPresenter {
     // MARK: Preview (Settings > Windows)
 
     /// Shows a style with sample data. Nothing here touches the timer.
-    func showPreview(_ style: WindowStyle) {
+    func showPreview(_ style: PromptWindowStyle) {
         closePreview()
         let spec = PromptSpec(kind: .rest, progress: .done(2, of: 4, longBreakNext: false),
                               snoozeMinutes: controller.settings.snoozeMinutes, canSkip: true)

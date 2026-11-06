@@ -13,10 +13,10 @@ final class PromptPanel: NSPanel {
 /// Panels float above other apps, follow you across Spaces and appear over full-screen apps.
 @MainActor
 final class PromptWindowSet {
-    let style: WindowStyle
+    let style: PromptWindowStyle
     private var panels: [PromptPanel] = []
 
-    init(style: WindowStyle, model: PromptModel, onEscape: @escaping () -> Void) {
+    init(style: PromptWindowStyle, model: PromptModel, onEscape: @escaping () -> Void) {
         self.style = style
 
         let active = Self.activeScreen()
@@ -77,7 +77,7 @@ final class PromptWindowSet {
         return NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) } ?? NSScreen.main ?? NSScreen.screens[0]
     }
 
-    private static func frame(for style: WindowStyle, on screen: NSScreen) -> NSRect {
+    private static func frame(for style: PromptWindowStyle, on screen: NSScreen) -> NSRect {
         let area = screen.visibleFrame
         switch style {
         case .small:

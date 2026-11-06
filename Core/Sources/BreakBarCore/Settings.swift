@@ -14,7 +14,7 @@ public enum WhenRestEnds: String, Codable, CaseIterable, Sendable {
 }
 
 /// How a Rest / Start working prompt is shown.
-public enum WindowStyle: String, Codable, CaseIterable, Sendable {
+public enum PromptWindowStyle: String, Codable, CaseIterable, Sendable {
     case small, maximised, fullScreen, banner
 }
 
@@ -53,7 +53,7 @@ public struct TimerSettings: Codable, Equatable, Sendable {
     public var notificationsEnabled = true
 
     // Presentation
-    public var windowStyle = WindowStyle.small
+    public var windowStyle = PromptWindowStyle.small
     public var showTimerInMenuBar = true
 
     public init() {}
@@ -82,7 +82,7 @@ public struct TimerSettings: Codable, Equatable, Sendable {
         dingVolume = try c.decodeIfPresent(Double.self, forKey: .dingVolume) ?? d.dingVolume
         tickingVolume = try c.decodeIfPresent(Double.self, forKey: .tickingVolume) ?? d.tickingVolume
         notificationsEnabled = try c.decodeIfPresent(Bool.self, forKey: .notificationsEnabled) ?? d.notificationsEnabled
-        windowStyle = try c.decodeIfPresent(WindowStyle.self, forKey: .windowStyle) ?? d.windowStyle
+        windowStyle = try c.decodeIfPresent(PromptWindowStyle.self, forKey: .windowStyle) ?? d.windowStyle
         showTimerInMenuBar = try c.decodeIfPresent(Bool.self, forKey: .showTimerInMenuBar) ?? d.showTimerInMenuBar
     }
 
