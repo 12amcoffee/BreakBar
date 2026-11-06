@@ -1,7 +1,7 @@
 # XcodeGen spec. Run `xcodegen` in this folder to produce BreakBar.xcodeproj.
 name: BreakBar
 options:
-  bundleIdPrefix: com.fnm945
+  bundleIdPrefix: com.12amcoffee
   developmentLanguage: en
   deploymentTarget:
     macOS: "13.0"
@@ -26,7 +26,7 @@ targets:
         CFBundleDisplayName: BreakBar
         CFBundleLocalizations: [en, zh-Hans, ja]
         CFBundleURLTypes:
-          - CFBundleURLName: com.fnm945.BreakBar
+          - CFBundleURLName: com.12amcoffee.BreakBar
             CFBundleURLSchemes: [breakbar]
         LSUIElement: true              # menu bar only, no Dock icon
         LSApplicationCategoryType: public.app-category.productivity
@@ -36,7 +36,7 @@ targets:
         com.apple.security.app-sandbox: true
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.fnm945.BreakBar
+        PRODUCT_BUNDLE_IDENTIFIER: com.12amcoffee.BreakBar
         SWIFT_VERSION: "5.9"
         MARKETING_VERSION: "0.1.0"
         CURRENT_PROJECT_VERSION: "1"

@@ -144,7 +144,7 @@ System notifications are only sent when no window says the same thing (e.g. auto
   "Start timer" to get that.
 - **Hotkeys** (Settings > General): start/stop, and "answer window" (presses Start resting / Start working).
 - **Event log**: one JSON line per state change in `Application Support/BreakBar/events.jsonl`
-  inside the app's sandbox container (`~/Library/Containers/com.fnm945.BreakBar/Data/Library/Application Support/BreakBar/`).
+  inside the app's sandbox container (`~/Library/Containers/com.12amcoffee.BreakBar/Data/Library/Application Support/BreakBar/`).
 
 ## Manual test checklist (things unit tests can't see)
 
