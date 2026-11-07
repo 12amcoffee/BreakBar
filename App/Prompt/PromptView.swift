@@ -26,7 +26,7 @@ struct PromptView: View {
         case .maximised:
             GeometryReader { geo in windowCard(base: min(geo.size.width, geo.size.height) * 0.034) }
         case .fullScreen:
-            GeometryReader { geo in fullScreen(base: min(geo.size.width, geo.size.height) * 0.033) }
+            GeometryReader { geo in fullScreen(base: min(geo.size.width, geo.size.height) * 0.025) }
         }
     }
 
@@ -46,7 +46,7 @@ struct PromptView: View {
     private func fullScreen(base: CGFloat) -> some View {
         ZStack(alignment: .topTrailing) {
             palette.background.ignoresSafeArea()
-            stack(base: base, titleEm: 4.3, iconEm: 3.6, clockEm: 4.4, barEm: 14)
+            stack(base: base, titleEm: 3.8, iconEm: 3.2, clockEm: 4.0, barEm: 14)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             Button { h.hide() } label: {
                 Text("Close (Esc)")
