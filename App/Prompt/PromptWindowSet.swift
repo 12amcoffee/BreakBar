@@ -71,9 +71,7 @@ final class PromptWindowSet {
                 panel.animator().alphaValue = 1
             }
         case .small:
-            // Key window (without activating BreakBar) so Esc works straight away. The cost: keys you were
-            // typing into another app when it appeared go to this window until you close it.
-            panels.first?.makeKeyAndOrderFront(nil)
+            panels.first?.orderFrontRegardless()          // click-only: never takes the keyboard from what you are typing
         case .maximised, .fullScreen:
             NSApp.activate(ignoringOtherApps: true)       // so Esc works straight away
             panels.first?.makeKeyAndOrderFront(nil)

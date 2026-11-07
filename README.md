@@ -177,22 +177,23 @@ prompts never appear.
   nor rest. **Repeated snoozing is capped** (default 3 per break); after that only Start resting and
   Skip are offered. A window left snoozed or unanswered longer than the inactivity limit ends the
   run (idle, set reset) so you don't return hours later to a stale prompt.
-- **Closing a window** (Close / Hide / Esc) never changes the timer. The menu bar keeps showing the
+- **Closing a window** (Close / Hide / ×, or Esc where it applies) never changes the timer. The menu bar keeps showing the
   waiting state and the popover still has the Start button.
 - **Sleep**: a work or rest that ends more than 60 s late (lid closed) goes to idle without counting.
 
 ## Windows
 
 All four styles float above other apps, follow you across Spaces and appear over full-screen apps.
-Esc and a Close button always work. *Preview* buttons in Settings > Windows show each style with
-sample data (a preview closes itself after 12 s and never touches the timer).
+Every style has a Close button (or ×); Esc also closes the maximised window and the full-screen overlay.
+*Preview* buttons in Settings > Windows show each style with sample data (a preview closes itself
+after 12 s and never touches the timer).
 
 | Style | Behaviour |
 |---|---|
-| Small floating window | centred card; does not steal keyboard focus (click it, or use the answer hotkey) |
-| Maximised floating window | nearly full screen; menu bar and Dock stay visible |
-| Full-screen overlay | dims every display; "Close (Esc)" button; takes focus so Esc works |
-| Notification-style banner | slides in at top right; own window, not a system notification |
+| Small floating window | centred card; click-only, never takes the keyboard from what you are typing (use the answer hotkey from the keyboard) |
+| Maximised floating window | nearly full screen; menu bar and Dock stay visible; takes focus so Esc closes it |
+| Full-screen overlay | dims every display (tomato in light mode, ink in dark); "Close (Esc)" button; takes focus so Esc closes it |
+| Notification-style banner | slides in at top right; click-only (× button); own window, not a system notification |
 
 After **Start resting** the window becomes a countdown with +N min, Skip rest and Hide.
 System notifications are only sent when no window says the same thing (e.g. automatic rest).
@@ -213,7 +214,7 @@ System notifications are only sent when no window says the same thing (e.g. auto
 2. Settings: set work to 1 min; Start; at zero the Rest window appears and the menu bar shows `+00:xx`.
 3. **Start resting** starts the rest only then. Snooze 2 min hides it and it comes back.
 4. Each style: Preview, then live. Check over a full-screen app and on another Space.
-5. Full-screen overlay: Esc and the Close button both dismiss; with two displays both dim.
+5. Maximised window and full-screen overlay: Esc and the Close button both dismiss (with two displays both dim). Small window and banner: the Close / × button.
 6. Sounds: move the Ding slider (plays on release); work end plays it.
 7. Notification appears with Skip when "When work ends" is automatic.
 8. Hotkeys work from another app. `open breakbar://toggle` works in Terminal.

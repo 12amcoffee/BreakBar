@@ -106,22 +106,28 @@ struct PromptView: View {
         .frame(maxWidth: base * 24)
     }
 
-    /// While resting, "Hide" is the way out. Esc does the same, except on the full-screen overlay,
-    /// which has its own Close (Esc) button.
-    @ViewBuilder private var hideButton: some View {
-        if style == .fullScreen {
-            Button("Hide") { h.hide() }
-        } else {
-            Button("Hide") { h.hide() }.keyboardShortcut(.cancelAction)
-        }
+    /// While resting, "Hide" is the way out. Esc does the same on the maximised window; the small window
+    /// is click-only, and the full-screen overlay has its own Close (Esc) button.
+    private var hideButton: some View {
+        Button("Hide") { h.hide() }
+            .escapeShortcut(style == .maximised)
     }
 
     private func closeLink(base: CGFloat) -> some View {
-        Button { h.hide() } label: { Text("Close · Esc") }
+        Button { h.hide() } label: { closeLabel }
             .buttonStyle(.plain)
             .font(.system(size: base * 0.85))
             .foregroundStyle(palette.secondaryText)
-            .keyboardShortcut(.cancelAction)
+            .escapeShortcut(style == .maximised)
+    }
+
+    /// "Close · Esc" only where Esc really closes the window.
+    @ViewBuilder private var closeLabel: some View {
+        if style == .maximised {
+            Text("Close · Esc")
+        } else {
+            Text("Close")
+        }
     }
 
     // MARK: Banner
@@ -143,8 +149,7 @@ struct PromptView: View {
             Button { h.hide() } label: { Image(systemName: "xmark").font(.system(size: 11, weight: .semibold)) }
                 .buttonStyle(.plain)
                 .foregroundStyle(palette.secondaryText)
-                .keyboardShortcut(.cancelAction)
-                .accessibilityLabel("Close")
+                .accessibilityLabel("Close")        // the banner is click-only: it never takes the keyboard
         }
         .padding(.horizontal, 14)
         .foregroundStyle(palette.text)
@@ -224,6 +229,17 @@ struct PromptView: View {
                 Capsule().fill(palette.barFill).frame(width: width * fraction)
             }
             .frame(width: width, height: height)
+        }
+    }
+}
+
+private extension View {
+    /// Esc triggers this button, when `on`.
+    @ViewBuilder func escapeShortcut(_ on: Bool) -> some View {
+        if on {
+            self.keyboardShortcut(.cancelAction)
+        } else {
+            self
         }
     }
 }
