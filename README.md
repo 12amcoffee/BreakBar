@@ -21,8 +21,8 @@ click <b>Start resting</b>.
 </p>
 
 <p align="center">
-  <b>About 3.4 MB once installed.</b> That is very small: far under 50 MB, with one small timer,
-  no network use and nothing else running in the background, so it stays light on your Mac.
+  <b>About 3.4 MB once installed.</b> It runs one small timer, with no network use,
+  so it stays light on your Mac.
   <br>
   <sub>Installer (DMG): 1.1 MB · Source code: 350 KB (zip)</sub>
 </p>
@@ -126,59 +126,23 @@ earlier, right-click → Open also works.) Or skip the prompt with one command:
 
 Releases are built by GitHub Actions from a tag such as `v2.0.0`, never on a personal machine.
 
-## Project layout
+## Windows
 
-```
-Core/       Swift package, no UI: settings, state machine, formatting, URL commands, tests
-App/        the macOS app: menu bar, dropdown, Settings, windows, sounds, notifications, hotkeys
-  Prompt/     the Rest / Start working windows (4 styles)
-  *.lproj     English, Chinese (Simplified), Japanese strings
-Design/     logo, download button, masters and editable SVG sources (tomato #E5432B, cream #FFF9F2)
-docs/       the interactive preview page and the images used in this README
-packaging/  Homebrew cask template, installer layout
-scripts/    make-sounds.py (synthesises the sounds), check-strings.py
-```
+All four styles float above other apps, follow you across Spaces and appear over full-screen apps.
+Every style has a Close button (or ×); Esc also closes the maximised window and the full-screen overlay
+(and returns you to the app you were using), and Return answers the maximised window.
+*Preview* buttons in Settings > Windows show each style with sample data (a preview closes itself
+after 12 s and never touches the timer).
 
-Want to build it yourself or work on the code? See [BUILDING.md](BUILDING.md).
+| Style | Behaviour |
+|---|---|
+| Small floating window | centred card; click-only, never takes the keyboard from what you are typing (use the answer hotkey from the keyboard) |
+| Maximised floating window | nearly full screen; menu bar and Dock stay visible; takes focus, so Return starts the rest (or the work) and Esc closes it, handing focus back to the app you were using |
+| Full-screen overlay | dims every display (tomato in light mode, ink in dark); "Close (Esc)" button; takes focus so Esc closes it |
+| Notification-style banner | slides in at top right; click-only (× button); own window, not a system notification |
 
-The state machine is one pure function-like struct (`Core/.../TimerMachine.swift`): you give it an
-event and the current time, it changes state and returns effects (sound, notification). It never
-touches the screen, which is why it is fully unit-tested. The app turns state into windows.
-
-## State machine
-
-| State | Meaning | Menu bar |
-|---|---|---|
-| `idle` | nothing running | icon only |
-| `working(endsAt)` | work countdown | hourglass, `32:10` |
-| `awaitingRest(kind, since, snoozes)` | work done, Rest window waiting for **Start resting** | bell, `+01:23` (counts up) |
-| `snoozed(kind, until, snoozes)` | Snooze pressed, window returns at `until` | zzz, `01:45` |
-| `resting(kind, endsAt)` | short or long rest countdown | cup / bed, `08:12` |
-| `awaitingWork(kind, since)` | rest done, Start working window waiting | bell badge, `+00:34` |
-| `paused(phase, remaining, since)` | work or rest paused | pause, `44:00` |
-
-| From | Event | To | Notes |
-|---|---|---|---|
-| idle | start | working | inactivity rule may reset the set first |
-| working | timer ends | resting **or** awaitingRest | set counter +1; "When work ends" decides |
-| working | timer ends > 60 s late | idle | the Mac slept; session not counted |
-| awaitingRest | startRest | resting | rest timer starts at the click |
-| awaitingRest | snooze | snoozed | only if snoozes < limit |
-| snoozed | time passes | awaitingRest | window comes back |
-| awaitingRest / snoozed | skip | working | counter unchanged |
-| resting | extend | resting | end time + increment |
-| resting | skip | working | counter unchanged |
-| resting | timer ends | working / awaitingWork / idle | "When rest ends" decides |
-| awaitingWork | startWork | working | |
-| awaitingWork | extend | resting | a fresh rest of the increment length |
-| awaitingWork | skip | working | same as startWork |
-| working / resting | pause | paused | working also stops the ticking sound |
-| paused | resume | working / resting | remaining time kept |
-| any non-idle | stop | idle | counter kept (see below) |
-| awaitingRest / awaitingWork / snoozed / paused | nothing for longer than the inactivity limit | idle | set reset |
-
-**Continuous cycles** forces both "When work ends" and "When rest ends" to *automatic*, so the
-prompts never appear.
+After **Start resting** the window becomes a countdown with +N min, Skip rest and Hide.
+System notifications are only sent when no window says the same thing (e.g. automatic rest).
 
 ## Long break counter
 
@@ -205,46 +169,14 @@ prompts never appear.
   waiting state and the dropdown still has the Start button.
 - **Sleep**: a work or rest that ends more than 60 s late (lid closed) goes to idle without counting.
 
-## Windows
-
-All four styles float above other apps, follow you across Spaces and appear over full-screen apps.
-Every style has a Close button (or ×); Esc also closes the maximised window and the full-screen overlay
-(and returns you to the app you were using), and Return answers the maximised window.
-*Preview* buttons in Settings > Windows show each style with sample data (a preview closes itself
-after 12 s and never touches the timer).
-
-| Style | Behaviour |
-|---|---|
-| Small floating window | centred card; click-only, never takes the keyboard from what you are typing (use the answer hotkey from the keyboard) |
-| Maximised floating window | nearly full screen; menu bar and Dock stay visible; takes focus, so Return starts the rest (or the work) and Esc closes it, handing focus back to the app you were using |
-| Full-screen overlay | dims every display (tomato in light mode, ink in dark); "Close (Esc)" button; takes focus so Esc closes it |
-| Notification-style banner | slides in at top right; click-only (× button); own window, not a system notification |
-
-After **Start resting** the window becomes a countdown with +N min, Skip rest and Hide.
-System notifications are only sent when no window says the same thing (e.g. automatic rest).
-
 ## Integrations
 
-- **URLs**: `open breakbar://start` · `stop` · `toggle` · `startRest` · `startWork` · `snooze` · `skip` · `extend` · `pause` · `resume` · `resetSet`
-- **Shortcuts app**: actions Start timer, Stop timer, Start resting, Start working, Skip rest.
-  Apps cannot switch Do Not Disturb / Focus themselves; in Shortcuts, combine "Set Focus" with
-  "Start timer" to get that.
-- **Hotkeys** (Settings > General): start/stop, and "answer window" (presses Start resting / Start working).
-- **Event log**: one JSON line per state change in `Application Support/BreakBar/events.jsonl`
-  inside the app's sandbox container (`~/Library/Containers/com.12amcoffee.BreakBar/Data/Library/Application Support/BreakBar/`).
+Most people won't need these, but they are there:
 
-## Manual test checklist (things unit tests can't see)
-
-1. App appears in the menu bar with no Dock icon; the dropdown opens; Quit works.
-2. Click a pill, then its number: it becomes a text box; type a value and press Return. Nothing is selected until you click.
-3. Settings: set work to 1 min; Start; at zero the Rest window appears and the menu bar shows `+00:xx`.
-4. **Start resting** starts the rest only then. Snooze 2 min hides it and it comes back.
-5. Each style: Preview, then live. Check over a full-screen app and on another Space.
-6. Maximised window: Return starts the rest, Esc hides it and your previous app comes back. Full-screen overlay: Esc and Close (Esc) both dismiss (with two displays both dim). Small window and banner: the Close / × button.
-7. Sounds: move the Ding slider (plays on release); work end plays it.
-8. Notification appears with Skip when "When work ends" is automatic.
-9. Hotkeys work from another app. `open breakbar://toggle` works in Terminal.
-10. Quit and relaunch: settings and "Session x of N" are kept.
+- **Terminal:** `open breakbar://toggle`. Also `start`, `stop`, `startRest`, `startWork`, `snooze`, `skip`, `extend`, `pause`, `resume` and `resetSet`.
+- **Shortcuts app:** actions for Start timer, Stop timer, Start resting, Start working and Skip rest. Pair "Set Focus" with "Start timer" to turn on Do Not Disturb for each work session.
+- **Hotkeys** (Settings > General): one to start and stop, and one that answers the Rest or Start working window.
+- **Event log:** one line per state change, handy for charting your focus time. It lives in `~/Library/Containers/com.12amcoffee.BreakBar/Data/Library/Application Support/BreakBar/events.jsonl`.
 
 ## Feature checklist
 
@@ -276,6 +208,8 @@ System notifications are only sent when no window says the same thing (e.g. auto
 | Continuous cycles (toggle) | (default) | ✅ |
 | Shortcuts actions | – | ✅ |
 | Light and dark looks | – | ✅ cream and ink |
+
+Want to build it yourself or work on the code? See [DEVELOPING.md](DEVELOPING.md).
 
 ## Licence
 
