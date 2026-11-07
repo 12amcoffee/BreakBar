@@ -16,6 +16,7 @@ extension Color {
     static let cream = Color(hex: 0xFFF9F2)
     static let ink = Color(hex: 0x1F1A17)
     static let restPink = Color(hex: 0xFFC9BB)
+    static let coral = Color(hex: 0xFF8C6F)        // selected pill and rest progress bar in dark mode
 
     /// Warm window background: cream in light mode, ink in dark mode.
     static let surface = Color(nsColor: .bbSurface)
@@ -53,6 +54,9 @@ struct BBPalette {
     var barTrack: Color
     var barFill: Color
     var outline: Color? = nil   // secondary buttons are outlined instead of filled when set
+    var selectedFill: Color = .restPink     // the selected interval pill
+    var selectedLabel: Color = .ink
+    var selectedRing: Color? = .tomato      // nil: no ring (dark mode)
 
     static func surface(_ scheme: ColorScheme) -> BBPalette {
         if scheme == .dark {
@@ -62,7 +66,8 @@ struct BBPalette {
                 hover: Color(hex: 0xE5432B, opacity: 0.26),
                 primaryFill: .tomato, primaryPressed: .tomatoPress, primaryLabel: .cream,
                 dotDone: .tomato, dotOff: Color(hex: 0xFFF9F2, opacity: 0.22), icon: .tomato,
-                barTrack: Color(hex: 0xFFF9F2, opacity: 0.12), barFill: .restPink)
+                barTrack: Color(hex: 0xFFF9F2, opacity: 0.12), barFill: .coral,
+                selectedFill: .coral, selectedLabel: .ink, selectedRing: nil)
         }
         return BBPalette(
             background: .cream, text: .ink, secondaryText: Color(hex: 0x1F1A17, opacity: 0.62),
@@ -81,7 +86,7 @@ struct BBPalette {
                 hover: Color(hex: 0xE5432B, opacity: 0.3),
                 primaryFill: .tomato, primaryPressed: .tomatoPress, primaryLabel: .cream,
                 dotDone: .tomato, dotOff: Color(hex: 0xFFF9F2, opacity: 0.22), icon: .tomato,
-                barTrack: Color(hex: 0xFFF9F2, opacity: 0.28), barFill: .restPink,
+                barTrack: Color(hex: 0xFFF9F2, opacity: 0.28), barFill: .coral,
                 outline: Color(hex: 0xFFF9F2, opacity: 0.5))
         }
         return BBPalette(                                      // A: tomato screen, cream button

@@ -199,6 +199,8 @@ private struct IntervalPill: View {
     let action: () -> Void
     @State private var hovering = false
 
+    private var shape: RoundedRectangle { RoundedRectangle(cornerRadius: 9, style: .continuous) }
+
     var body: some View {
         Button(action: action) {
             VStack(spacing: 1) {
@@ -209,24 +211,25 @@ private struct IntervalPill: View {
                     .font(.system(size: 10.5))
                     .tracking(0.6)
                     .textCase(.uppercase)
-                    .foregroundStyle(selected ? Color.ink.opacity(0.7) : palette.secondaryText)
+                    .foregroundStyle(selected ? palette.selectedLabel.opacity(0.7) : palette.secondaryText)
             }
-            .foregroundStyle(selected ? Color.ink : palette.text)
+            .foregroundStyle(selected ? palette.selectedLabel : palette.text)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 6)
-            .background(background, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+            .background(background, in: shape)
             .overlay {
-                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .strokeBorder(Color.tomato, lineWidth: selected ? 1.5 : 0)
+                if selected, let ring = palette.selectedRing {
+                    shape.strokeBorder(ring, lineWidth: 1.5)
+                }
             }
-            .contentShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+            .contentShape(shape)
         }
         .buttonStyle(.plain)
         .onHover { hovering = $0 }
     }
 
     private var background: Color {
-        if selected { return .restPink }
+        if selected { return palette.selectedFill }
         return hovering ? palette.hover : palette.control
     }
 }
