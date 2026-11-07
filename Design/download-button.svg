@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="276" height="56" viewBox="0 0 276 56" role="img" aria-label="Download BreakBar for macOS">
+  <rect width="276" height="56" rx="14" fill="#E5432B"/>
+  <g fill="none" stroke="#FFF9F2" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M38 17v16M31 27l7 7 7-7M30 40h16"/>
+  </g>
+  <text x="58" y="35" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#FFF9F2">Download for macOS</text>
+</svg>

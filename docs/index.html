@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="An interactive preview of BreakBar, a macOS menu bar Pomodoro timer with a Rest window.">
+<title>BreakBar interactive preview</title>
+<style>
+:root {
+  /* page */
+  --bg: #F6F3F0; --fg: #1F1A17; --muted: #6B625C; --line: #DDD7D1; --chip: #E7E2DC;
+  --stage-l: linear-gradient(135deg, #CBC4BC, #E8E3DD);
+  --stage-d: linear-gradient(135deg, #34383F, #15171B);
+  /* brand */
+  --tomato: #E5432B; --tomato-press: #CC3A24; --cream: #FFF9F2; --ink: #1F1A17; --pink: #FFC9BB; --coral: #FF8C6F;
+  /* mock-up surfaces, light and dark */
+  --ml-bg: #FFF9F2; --ml-fg: #1F1A17; --ml-sub: rgba(31,26,23,.62); --ml-line: rgba(31,26,23,.13);
+  --ml-hover: rgba(255,201,187,.6); --ml-ctl: rgba(31,26,23,.08); --ml-edge: rgba(31,26,23,.14);
+  --md-bg: #1F1A17; --md-fg: #F3EDE7; --md-sub: rgba(243,237,231,.62); --md-line: rgba(255,249,242,.14);
+  --md-hover: rgba(229,67,43,.26); --md-ctl: rgba(255,249,242,.12); --md-edge: rgba(255,249,242,.16);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #151210; --fg: #EFE9E3; --muted: #A39A92; --line: #2E2824; --chip: #262120; }
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); line-height: 1.5; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 40px 16px 72px; }
+h1 { font-size: 30px; line-height: 1.15; margin: 0 0 8px; letter-spacing: -.01em; text-wrap: balance; }
+h2 { font-size: 20px; margin: 0 0 4px; text-wrap: balance; }
+h3.sub { font-size: 15px; margin: 30px 0 4px; }
+.lede, .cap { color: var(--muted); margin: 0; max-width: 66ch; }
+.cap { font-size: 14px; margin-bottom: 18px; }
+a { color: var(--tomato); }
+.top { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-top: 18px; }
+.top .go { background: var(--tomato); color: var(--cream); text-decoration: none; font-weight: 600; font-size: 14px; padding: 8px 16px; border-radius: 9px; }
+.top .go:hover { background: var(--tomato-press); }
+.notice { margin-top: 22px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13.5px; color: var(--muted); max-width: 70ch; }
+section { padding-top: 44px; margin-top: 44px; border-top: 1px solid var(--line); }
+header + section { margin-top: 28px; }
+code, .hex { font-family: var(--mono); font-size: .92em; }
+.row { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; }
+.label { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 8px; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; border-radius: 9px; background: var(--chip); margin-bottom: 18px; }
+.seg button { font: inherit; font-size: 13px; padding: 5px 14px; border: 0; border-radius: 7px; background: transparent; color: var(--fg); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--tomato); color: var(--cream); }
+.seg button:focus-visible, .btn-ext:focus-visible, .m button:focus-visible { outline: 2px solid var(--tomato); outline-offset: 2px; }
+.sticky { position: sticky; top: 0; z-index: 5; padding: 8px 0; background: var(--bg); }
+
+/* stages = a desktop to float the mock-ups on */
+.stage { border-radius: 14px; padding: 28px; display: flex; justify-content: center; align-items: flex-start; flex: 1 1 340px; min-width: 0; position: relative; }
+.stage.l { background: var(--stage-l); }
+.stage.d { background: var(--stage-d); }
+
+/* ---------- mock surface tokens ---------- */
+.m.light, .stage.l { --s-bg: var(--ml-bg); --s-fg: var(--ml-fg); --s-sub: var(--ml-sub); --s-line: var(--ml-line); --s-hover: var(--ml-hover); --s-ctl: var(--ml-ctl); --s-edge: var(--ml-edge); --s-dot-off: rgba(31,26,23,.2); --s-bar: var(--pink); }
+.m.dark, .stage.d { --s-bg: var(--md-bg); --s-fg: var(--md-fg); --s-sub: var(--md-sub); --s-line: var(--md-line); --s-hover: var(--md-hover); --s-ctl: var(--md-ctl); --s-edge: var(--md-edge); --s-dot-off: rgba(255,249,242,.22); --s-bar: var(--coral); }
+.m { background: var(--s-bg); color: var(--s-fg); border: 1px solid var(--s-edge); border-radius: 12px; box-shadow: 0 14px 40px rgba(0,0,0,.28); font-size: 13px; }
+.m button { font: inherit; color: inherit; }
+
+/* flat tomato button, cream label */
+.flat, .m .flat { background: var(--tomato); color: var(--cream); border: 0; border-radius: 8px; font-weight: 600; cursor: pointer; padding: 0 14px; height: 34px; width: 100%; }
+.flat:hover, .m .flat:hover { background: var(--tomato-press); }
+.ghost { background: var(--s-ctl); border: 0; border-radius: 7px; height: 28px; padding: 0 12px; cursor: pointer; }
+.ghost:hover { background: var(--s-hover); }
+
+.dots { display: inline-flex; gap: 6px; align-items: center; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--s-dot-off); display: inline-block; }
+.dot.done { background: var(--tomato); }
+.dot.cur { background: transparent; box-shadow: inset 0 0 0 2px var(--tomato); }
+
+/* typed numbers: plain text, a box on hover, an input on click */
+.num { font: inherit; color: inherit; background: transparent; border: 0; border-radius: 6px; padding: 3px 6px; min-width: 40px; text-align: right; cursor: text; font-variant-numeric: tabular-nums; }
+.num:hover { background: var(--s-ctl); }
+.numin { font: inherit; color: inherit; width: 44px; text-align: right; border: 0; border-radius: 6px; padding: 3px 6px; background: var(--s-ctl); outline: 1.5px solid var(--tomato); font-variant-numeric: tabular-nums; }
+
+/* ---------- popover ---------- */
+.pop { width: 272px; padding: 12px; display: grid; gap: 10px; }
+#popovers[data-state="idle"] [data-for]:not([data-for~="idle"]),
+#popovers[data-state="working"] [data-for]:not([data-for~="working"]),
+#popovers[data-state="waiting"] [data-for]:not([data-for~="waiting"]) { display: none; }
+.clock .b { display: none; }
+.clock:hover .a { display: none; } .clock:hover .b { display: inline; }
+.clock .a { font-variant-numeric: tabular-nums; font-family: var(--mono); font-weight: 500; }
+.progress { display: flex; gap: 10px; justify-content: center; align-items: center; color: var(--s-sub); }
+.acts { display: flex; gap: 8px; justify-content: center; }
+.rhythm { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.pill { border: 0; border-radius: 9px; background: var(--s-ctl); padding: 6px 0 5px; cursor: pointer; display: grid; justify-items: center; line-height: 1.15; }
+.pill b { font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.pill span { font-size: 10.5px; color: var(--s-sub); text-transform: uppercase; letter-spacing: .06em; }
+.pill:hover { background: var(--s-hover); }
+.m.light .pill[aria-pressed="true"] { background: var(--pink); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--tomato); }
+.m.dark .pill[aria-pressed="true"] { background: var(--coral); color: var(--ink); }
+.pill[aria-pressed="true"] span { color: rgba(31,26,23,.7); }
+.step { display: flex; align-items: center; gap: 6px; padding: 2px 4px 0; }
+.step[hidden] { display: none; }
+.step .lbl { flex: 1; white-space: nowrap; }
+.step .sb { width: 26px; height: 26px; border-radius: 7px; border: 0; background: var(--s-ctl); cursor: pointer; font-size: 15px; line-height: 1; }
+.step .sb:hover { background: var(--s-hover); }
+.step .unit { color: var(--s-sub); }
+.hr { height: 1px; background: var(--s-line); margin: 0 -2px; }
+.item { display: flex; justify-content: space-between; padding: 6px 8px; margin: 0 -8px; border-radius: 7px; cursor: default; }
+.item:hover { background: var(--s-hover); }
+.item.dis { color: var(--s-sub); }
+.item.dis:hover { background: transparent; }
+.item kbd { font-family: var(--font); color: var(--s-sub); }
+
+/* ---------- settings window ---------- */
+.set { width: 420px; max-width: 100%; padding-bottom: 14px; }
+.titlebar { display: flex; align-items: center; gap: 7px; padding: 11px 14px; position: relative; }
+.titlebar i { width: 11px; height: 11px; border-radius: 50%; background: var(--s-dot-off); }
+.titlebar i:first-child { background: #FF5F57; }
+.titlebar strong { position: absolute; left: 0; right: 0; text-align: center; font-weight: 600; pointer-events: none; }
+.tabs { display: flex; gap: 3px; padding: 3px; margin: 4px 14px 12px; border-radius: 10px; background: var(--s-ctl); }
+.tabs span { flex: 1; text-align: center; padding: 5px 0; border-radius: 7px; font-weight: 500; }
+.tabs .on { background: var(--tomato); color: var(--cream); }
+.grp { margin: 0 14px 12px; }
+.grp h4 { margin: 0 0 6px 2px; font-size: 12px; font-weight: 600; color: var(--s-sub); }
+.card { border: 1px solid var(--s-line); border-radius: 10px; overflow: hidden; }
+.card .r { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; min-height: 38px; }
+.card .r + .r { border-top: 1px solid var(--s-line); }
+.card .v { color: var(--s-sub); display: flex; gap: 6px; align-items: center; }
+.card .v .num { color: var(--s-fg); }
+.stp { width: 14px; height: 22px; border-radius: 5px; background: var(--s-ctl); display: grid; place-items: center; font-size: 7px; line-height: 1; color: var(--s-sub); }
+.tog { width: 36px; height: 21px; border-radius: 11px; background: var(--tomato); position: relative; }
+.tog::after { content: ""; position: absolute; top: 2px; right: 2px; width: 17px; height: 17px; border-radius: 50%; background: #fff; }
+.tog.off { background: var(--s-ctl); } .tog.off::after { right: auto; left: 2px; }
+.sl { width: 150px; height: 4px; border-radius: 2px; background: var(--s-ctl); position: relative; }
+.sl i { position: absolute; left: 0; top: 0; bottom: 0; width: 55%; border-radius: 2px; background: var(--tomato); }
+.sl i::after { content: ""; position: absolute; right: -7px; top: -5px; width: 14px; height: 14px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.35); }
+
+/* ---------- Rest window content, shared by small, maximised and overlay (sized in em) ---------- */
+#wins[data-st="waiting"] [data-s]:not([data-s~="waiting"]),
+#wins[data-st="resting"] [data-s]:not([data-s~="resting"]),
+#wins[data-st="work"] [data-s]:not([data-s~="work"]) { display: none !important; }
+.cc { display: grid; justify-items: center; gap: .9em; text-align: center; width: 100%; }
+.cc svg, .bn svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.cc .ic { width: 2.9em; height: 2.9em; color: var(--tomato); }
+.cc h3 { margin: 0; font-size: 2em; line-height: 1.05; font-weight: 650; letter-spacing: -.01em; }
+.cc .prog { display: flex; gap: .7em; align-items: center; color: var(--s-sub); font-size: .95em; }
+.cc .dots { gap: .45em; }
+.cc .dot { width: .7em; height: .7em; }
+.cc .clk { font-family: var(--mono); font-weight: 300; font-size: 3.6em; line-height: 1; font-variant-numeric: tabular-nums; }
+.cc .bar { width: 16em; max-width: 90%; height: .35em; border-radius: 1em; background: var(--s-ctl); overflow: hidden; }
+.cc .bar i { display: block; height: 100%; background: var(--s-bar); width: 3%; }
+.cc .btns { display: flex; flex-wrap: wrap; gap: .6em; justify-content: center; width: 100%; max-width: 24em; margin-top: .3em; }
+.cc .btns button { font: inherit; font-size: 1em; padding: 0 1.1em; border-radius: .6em; border: 0; cursor: pointer; }
+.cc .btns .flat { flex: 1 1 100%; width: auto; height: 2.6em; }
+.cc .btns .ghost { height: 2.3em; }
+.fx .cc .btns { font-size: 13.5px; }                       /* maximised: buttons the size of the small window's */
+.cc .hint { font-size: .75em; color: var(--s-sub); }
+.cc .close { background: none; border: 0; cursor: pointer; color: var(--s-sub); font: inherit; font-size: .85em; margin-top: .2em; }
+
+.sm { width: 340px; max-width: 100%; padding: 26px 22px 18px; border-radius: 18px; font-size: 13.5px; }
+
+/* maximised floating window: a big window, with menu bar and Dock still visible */
+.mxrow { display: grid; gap: 20px; max-width: 900px; }
+.fx { container-type: size; position: relative; width: 100%; aspect-ratio: 16 / 10; border-radius: 14px; overflow: hidden; }
+.fx.l { background: var(--stage-l); } .fx.d { background: var(--stage-d); }
+.mb { position: absolute; top: 0; left: 0; right: 0; height: 22px; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; font-size: 11px; z-index: 1; }
+.fx.l .mb, .stage.l .mb { background: rgba(255,255,255,.5); color: #1F1A17; }
+.fx.d .mb, .stage.d .mb { background: rgba(0,0,0,.4); color: #EEE; }
+.mb .gl { display: inline-flex; gap: 2px; align-items: center; margin-right: 8px; vertical-align: middle; }
+.mb .gl i { height: 6px; border-radius: 3px; background: currentColor; }
+.mb .gl i:first-child { width: 14px; } .mb .gl i:last-child { width: 5px; opacity: .6; }
+.fx .win { position: absolute; top: 9cqh; bottom: 14cqh; left: 4cqw; right: 4cqw; border-radius: 2.4cqmin; display: grid; place-items: center; font-size: 3.4cqmin; padding: 2cqmin; }
+.dock { position: absolute; bottom: 1.6cqh; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; padding: 6px 10px; border-radius: 16px; }
+.fx.l .dock { background: rgba(255,255,255,.45); } .fx.d .dock { background: rgba(255,255,255,.14); }
+.dock i { width: 3.4cqmin; height: 3.4cqmin; min-width: 20px; min-height: 20px; border-radius: 22%; background: rgba(120,120,120,.55); }
+.dock i:nth-child(2) { background: var(--tomato); }
+
+/* notification-style banner */
+.bnstage { min-height: 150px; padding-top: 52px; justify-content: flex-end; align-items: flex-start; }
+.bnstage .mb { border-radius: 14px 14px 0 0; }
+.bn { display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 14px; border-radius: 14px; width: min(100%, 560px); }
+.bn .ic { width: 26px; height: 26px; color: var(--tomato); flex: none; }
+.bn .txt { display: grid; line-height: 1.25; min-width: 0; flex: 1; }
+.bn .txt b { font-weight: 650; }
+.bn small { color: var(--s-sub); font-size: 12px; font-variant-numeric: tabular-nums; }
+.bn .bb { display: flex; gap: 6px; flex: none; }
+.bn .bb button { height: 28px; padding: 0 11px; border-radius: 7px; border: 0; cursor: pointer; font-size: 12.5px; width: auto; }
+.bn .x2 { border: 0; background: none; color: var(--s-sub); font-size: 18px; cursor: pointer; padding: 0 2px; line-height: 1; }
+
+/* ---------- full-screen overlay: tomato in light mode, ink in dark mode ---------- */
+.ovwrap { flex: 1 1 420px; min-width: 0; max-width: 100%; }
+.ov { container-type: size; aspect-ratio: 16 / 10; width: 100%; position: relative; overflow: hidden; border-radius: 12px;
+  display: grid; place-items: center; font-family: var(--font); }
+.ov:fullscreen { aspect-ratio: auto; width: 100vw; height: 100vh; border-radius: 0; }
+.ov button { color: inherit; font: inherit; }
+.ov.a { background: var(--tomato); color: var(--cream); --s-sub: var(--cream); --s-ctl: rgba(255,249,242,.16); --s-hover: rgba(255,201,187,.28); --s-dot-off: rgba(255,249,242,.4); --s-bar: var(--pink); }
+.ov.b { background: var(--ink); color: var(--cream); --s-sub: rgba(243,237,231,.7); --s-ctl: rgba(255,249,242,.12); --s-hover: rgba(229,67,43,.3); --s-dot-off: rgba(255,249,242,.22); --s-bar: var(--coral); }
+/* container units size against the nearest ancestor container, so the sizing lives on this inner wrapper */
+.ov .cc { gap: 1em; font-size: 2.5cqmin; padding: 0 6cqw; }
+.ov .cc .ic { width: 3.2em; height: 3.2em; color: var(--cream); }
+.ov.b .cc .ic { color: var(--tomato); }
+.ov .cc h3 { font-size: 3.8em; font-weight: 700; letter-spacing: -.02em; }
+.ov .cc .prog { font-size: 1em; }
+.ov .cc .clk { font-size: 4em; }
+.ov .cc .bar { width: 14em; background: rgba(255,249,242,.28); }
+.ov.a .dot.done { background: var(--cream); } .ov.a .dot.cur { background: transparent; box-shadow: inset 0 0 0 .13em var(--cream); }
+.ov .cc .btns { max-width: 24em; gap: .7em; }
+.ov .cc .btns .flat { flex: 0 1 auto; padding: 0 1.6em; height: 2.7em; }
+.ov.a .cc .btns .flat { background: var(--cream); color: var(--ink); } .ov.a .cc .btns .flat:hover { background: #fff; }
+.ov.b .cc .btns .flat { background: var(--tomato); color: var(--cream); }
+.ov .cc .btns .ghost { background: transparent; box-shadow: inset 0 0 0 .1em rgba(255,249,242,.5); height: 2.7em; }
+.ov .cc .btns .ghost:hover { background: var(--s-hover); }
+.ov .x { position: absolute; top: 3cqmin; right: 3cqmin; font-size: 2.1cqmin; padding: .9cqmin 2cqmin; border: 0; border-radius: 2cqmin; background: rgba(255,249,242,.16); cursor: pointer; }
+.ov .x:hover { background: rgba(255,249,242,.28); }
+.btn-ext { margin-top: 10px; font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--fg); cursor: pointer; }
+.btn-ext:hover { background: var(--chip); }
+.note { font-size: 12.5px; color: var(--muted); margin-top: 6px; min-height: 1.4em; }
+
+/* ---------- palette ---------- */
+.sw { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 22px; }
+.sw div { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.sw .c { height: 64px; border: 0; border-radius: 0; display: block; }
+.sw p { margin: 0; padding: 8px 12px 0; font-weight: 600; font-size: 14px; }
+.sw small { display: block; padding: 0 12px 10px; color: var(--muted); font-size: 12.5px; }
+table { border-collapse: collapse; width: 100%; max-width: 680px; font-size: 14px; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.scroll { overflow-x: auto; }
+footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+@media (prefers-reduced-motion: no-preference) { .flat, .pill, .item, .ghost, .num { transition: background .12s; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>BreakBar interactive preview</h1>
+    <p class="lede">A menu bar Pomodoro timer for macOS with fully custom intervals and a Rest window that waits for you. Hover, click and type: everything below responds the way the app does.</p>
+    <div class="top">
+      <a class="go" href="https://github.com/12amcoffee/BreakBar/releases/latest">Download BreakBar</a>
+      <a href="https://github.com/12amcoffee/BreakBar">View on GitHub</a>
+    </div>
+    <p class="notice">This page is a design preview built from mock-ups, so it shows the looks and behaviour but is not the app itself. BreakBar needs macOS 13 or later.</p>
+  </header>
+
+  <!-- 1. Dropdown -->
+  <section>
+    <h2>The dropdown</h2>
+    <p class="cap">Work, short rest and long rest sit under the Start button. Click a pill to open its stepper. The number looks like plain text until you hover it; click it to type a value, then press Return (Esc cancels).</p>
+    <div class="seg" id="stateSeg" role="group" aria-label="Timer state">
+      <button aria-pressed="true" data-s="idle">Idle</button>
+      <button aria-pressed="false" data-s="working">Working</button>
+      <button aria-pressed="false" data-s="waiting">Rest window waiting</button>
+    </div>
+    <div class="row" id="popovers" data-state="idle">
+      <div class="stage l"><div class="m light pop" data-pop></div></div>
+      <div class="stage d"><div class="m dark pop" data-pop></div></div>
+    </div>
+  </section>
+
+  <!-- 2. Settings -->
+  <section>
+    <h2>Settings</h2>
+    <p class="cap">The same warm surfaces. Numbers can be typed here too: hover one, click it and type. Switches and sliders use the tomato accent; the steppers stay grey because macOS draws them itself.</p>
+    <div class="row">
+      <div class="stage l"><div class="m light set" data-set></div></div>
+      <div class="stage d"><div class="m dark set" data-set></div></div>
+    </div>
+  </section>
+
+  <!-- 3. All window styles -->
+  <section id="wins" data-st="waiting">
+    <h2>The Rest and Start working windows</h2>
+    <p class="cap">Four styles, chosen in Settings. One switch changes every mock-up below. <b>Waiting to rest</b> is the Rest window. <b>Resting</b> is what it becomes after you click Start resting. <b>Break is over</b> is the Start working window.</p>
+    <div class="sticky">
+      <div class="seg" id="winSeg" role="group" aria-label="Window state" style="margin:0">
+        <button aria-pressed="true" data-st="waiting">Waiting to rest</button>
+        <button aria-pressed="false" data-st="resting">Resting</button>
+        <button aria-pressed="false" data-st="work">Break is over</button>
+      </div>
+    </div>
+
+    <h3 class="sub">1 · Small floating window</h3>
+    <p class="cap" style="margin-bottom:12px">Click Close to dismiss it. It never takes the keyboard from whatever you are typing.</p>
+    <div class="row">
+      <div class="stage l"><div class="m light sm"><div class="cc" data-cc="small"></div></div></div>
+      <div class="stage d"><div class="m dark sm"><div class="cc" data-cc="small"></div></div></div>
+    </div>
+
+    <h3 class="sub">2 · Maximised floating window</h3>
+    <p class="cap" style="margin-bottom:12px">Nearly full screen, with the menu bar and Dock still visible. Return starts the rest (or the work), Esc or Close dismisses it, and focus goes back to the app you were using.</p>
+    <div class="mxrow">
+      <div class="fx l"><div class="mb" data-mb></div><div class="m light win"><div class="cc" data-cc="max"></div></div><div class="dock"><i></i><i></i><i></i><i></i></div></div>
+      <div class="fx d"><div class="mb" data-mb></div><div class="m dark win"><div class="cc" data-cc="max"></div></div><div class="dock"><i></i><i></i><i></i><i></i></div></div>
+    </div>
+
+    <h3 class="sub">3 · Notification-style banner</h3>
+    <p class="cap" style="margin-bottom:12px">Slides in at the top right. Click × to dismiss it; it never takes the keyboard.</p>
+    <div class="row">
+      <div class="stage l bnstage"><div class="mb" data-mb></div><div class="m light bn" data-bn></div></div>
+      <div class="stage d bnstage"><div class="mb" data-mb></div><div class="m dark bn" data-bn></div></div>
+    </div>
+
+    <h3 class="sub">4 · Full-screen overlay</h3>
+    <p class="cap" style="margin-bottom:12px">A tomato screen in light mode and an ink screen in dark mode. Esc or Close (Esc) dismisses it. Open either one at full size on your screen.</p>
+    <div class="row">
+      <div class="ovwrap">
+        <p class="label">Light mode</p>
+        <div class="ov a" data-ov></div>
+        <button class="btn-ext" data-full="a">Preview light mode full screen</button>
+      </div>
+      <div class="ovwrap">
+        <p class="label">Dark mode</p>
+        <div class="ov b" data-ov></div>
+        <button class="btn-ext" data-full="b">Preview dark mode full screen</button>
+      </div>
+    </div>
+    <p class="note" id="fsNote" aria-live="polite"></p>
+  </section>
+
+  <!-- 4. Palette -->
+  <section>
+    <h2>Colours</h2>
+    <p class="cap">Tomato for actions, cream and ink for the light and dark surfaces, and a soft pink (coral in dark mode) for hover, selected and progress states.</p>
+    <div class="sw">
+      <div><span class="c" style="background:#E5432B"></span><p>Tomato</p><small><span class="hex">#E5432B</span> · buttons, switches, sliders, selected tab, done dots</small></div>
+      <div><span class="c" style="background:#FFF9F2"></span><p>Cream</p><small><span class="hex">#FFF9F2</span> · light-mode surfaces, button labels, overlay text</small></div>
+      <div><span class="c" style="background:#1F1A17"></span><p>Ink</p><small><span class="hex">#1F1A17</span> · dark-mode surfaces, light-mode text</small></div>
+      <div><span class="c" style="background:#FFC9BB"></span><p>Rest pink</p><small><span class="hex">#FFC9BB</span> · light-mode hover, selected pill, progress bar</small></div>
+      <div><span class="c" style="background:#FF8C6F"></span><p>Coral</p><small><span class="hex">#FF8C6F</span> · dark-mode selected pill and progress bar</small></div>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Pair</th><th>Contrast</th><th>Use</th></tr></thead>
+        <tbody>
+          <tr><td>Cream on tomato</td><td class="n">3.9 : 1</td><td>Button labels and the light-mode overlay. Fine for semibold labels and big titles.</td></tr>
+          <tr><td>Cream on ink</td><td class="n">16.5 : 1</td><td>Dark-mode text and the dark-mode overlay.</td></tr>
+          <tr><td>Ink on cream</td><td class="n">16.5 : 1</td><td>Light-mode text.</td></tr>
+          <tr><td>Tomato on ink</td><td class="n">4.2 : 1</td><td>Dots, icons and buttons in dark mode.</td></tr>
+          <tr><td>Ink on coral</td><td class="n">7.6 : 1</td><td>The selected pill in dark mode.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>BreakBar is free and open source (MIT). <a href="https://github.com/12amcoffee/BreakBar">Source and downloads on GitHub</a>.</footer>
+</div>
+
+<!-- templates -->
+<template id="t-pop">
+  <div>
+    <button class="flat" data-for="idle">Start</button>
+    <button class="flat clock" data-for="working"><span class="a">32:10</span><span class="b">Stop</span></button>
+    <button class="flat" data-for="waiting">Start resting</button>
+  </div>
+  <div class="progress">
+    <span class="dots" data-for="idle working"><i class="dot done"></i><i class="dot cur"></i><i class="dot"></i><i class="dot"></i></span>
+    <span data-for="idle working">Session 2 of 4</span>
+    <span class="dots" data-for="waiting"><i class="dot done"></i><i class="dot done"></i><i class="dot"></i><i class="dot"></i></span>
+    <span data-for="waiting">2 of 4 done</span>
+  </div>
+  <div class="acts" data-for="working"><button class="ghost">Pause</button></div>
+  <div class="acts" data-for="waiting"><button class="ghost">Snooze 2 min</button><button class="ghost">Skip rest</button></div>
+  <div class="rhythm">
+    <button class="pill" data-k="work" aria-pressed="false"><b></b><span>Work</span></button>
+    <button class="pill" data-k="short" aria-pressed="false"><b></b><span>Short</span></button>
+    <button class="pill" data-k="long" aria-pressed="false"><b></b><span>Long</span></button>
+  </div>
+  <div class="step" hidden>
+    <span class="lbl"></span>
+    <button class="sb" data-d="-1" aria-label="Decrease">−</button>
+    <button class="num" data-pnum aria-label="Edit minutes"></button>
+    <span class="unit">min</span>
+    <button class="sb" data-d="1" aria-label="Increase">+</button>
+  </div>
+  <div class="hr"></div>
+  <div>
+    <div class="item dis"><span>Reset set</span></div>
+    <div class="item"><span>Settings…</span><kbd>⌘,</kbd></div>
+    <div class="item"><span>About BreakBar</span></div>
+    <div class="item"><span>Quit</span><kbd>⌘Q</kbd></div>
+  </div>
+</template>
+
+<template id="t-set">
+  <div class="titlebar"><i></i><i></i><i></i><strong>Settings</strong></div>
+  <div class="tabs"><span class="on">Intervals</span><span>Breaks</span><span>Windows</span><span>Sounds</span><span>General</span></div>
+  <div class="grp"><h4>Durations</h4><div class="card">
+    <div class="r"><span>Work session</span><span class="v"><button class="num" data-snum data-min="1" data-max="180">45</button> min <i class="stp">▲<br>▼</i></span></div>
+    <div class="r"><span>Short rest</span><span class="v"><button class="num" data-snum data-min="1" data-max="180">10</button> min <i class="stp">▲<br>▼</i></span></div>
+    <div class="r"><span>Long rest</span><span class="v"><button class="num" data-snum data-min="1" data-max="180">20</button> min <i class="stp">▲<br>▼</i></span></div>
+  </div></div>
+  <div class="grp"><h4>Long break</h4><div class="card">
+    <div class="r"><span>Sessions per set</span><span class="v"><button class="num" data-snum data-min="1" data-max="12">4</button> <i class="stp">▲<br>▼</i></span></div>
+    <div class="r"><span>Delay long break by one session</span><span class="tog"></span></div>
+    <div class="r"><span>Allow pausing</span><span class="tog off"></span></div>
+    <div class="r"><span>Ding</span><span class="sl"><i></i></span></div>
+  </div></div>
+</template>
+
+<script>
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var CUP = '<path d="M5 9h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V9z"/><path d="M16 10h1.5a2 2 0 0 1 0 4H16"/><path d="M8 3v2M12 3v2"/>';
+  var HOUR = '<path d="M7 3h10M7 21h10"/><path d="M8 3c0 5 3 6 4 9-1 3-4 4-4 9"/><path d="M16 3c0 5-3 6-4 9 1 3 4 4 4 9"/>';
+  var DOTS2 = '<span class="dots"><i class="dot done"></i><i class="dot done"></i><i class="dot"></i><i class="dot"></i></span>';
+  var DOTS3 = '<span class="dots"><i class="dot done"></i><i class="dot done"></i><i class="dot cur"></i><i class="dot"></i></span>';
+
+  /* window content shared by small, maximised and overlay. `closeText` is what the close link says,
+     or empty where the style has its own close button (the overlay's top-right pill). */
+  function cc(closeText, hints) {
+    return '<svg class="ic" data-s="waiting resting" viewBox="0 0 24 24" aria-hidden="true">' + CUP + '</svg>' +
+    '<svg class="ic" data-s="work" viewBox="0 0 24 24" aria-hidden="true">' + HOUR + '</svg>' +
+    '<h3 data-s="waiting">Rest</h3><h3 data-s="resting">Resting</h3><h3 data-s="work">Break is over</h3>' +
+    '<div class="clk" data-s="resting" data-clk>09:42</div>' +
+    '<div class="bar" data-s="resting"><i data-bar></i></div>' +
+    '<div class="prog" data-s="waiting resting">' + DOTS2 + '<span>2 of 4 done</span></div>' +
+    '<div class="prog" data-s="work">' + DOTS3 + '<span>Session 3 of 4</span></div>' +
+    '<div class="btns" data-s="waiting"><button class="flat">Start resting</button><button class="ghost">Snooze 2 min</button><button class="ghost">Skip rest</button></div>' +
+    '<div class="btns" data-s="resting"><button class="ghost">+5 min</button><button class="ghost">Skip rest</button><button class="ghost">Hide</button></div>' +
+    '<div class="btns" data-s="work"><button class="flat">Start working</button><button class="ghost">+5 min</button></div>' +
+    (hints ? '<div class="hint" data-s="waiting">Press Return to start resting</div><div class="hint" data-s="work">Press Return to start working</div><div class="hint" data-s="resting">Press Esc to hide</div>' : '') +
+    (closeText ? '<button class="close" data-s="waiting work">' + closeText + '</button>' : '');
+  }
+
+  var BN =
+    '<svg class="ic" data-s="waiting resting" viewBox="0 0 24 24" aria-hidden="true">' + CUP + '</svg>' +
+    '<svg class="ic" data-s="work" viewBox="0 0 24 24" aria-hidden="true">' + HOUR + '</svg>' +
+    '<div class="txt">' +
+      '<b data-s="waiting">Rest</b><b data-s="resting">Resting</b><b data-s="work">Break is over</b>' +
+      '<small data-s="waiting">2 of 4 done</small><small data-s="resting"><span data-clk>09:42</span> left</small><small data-s="work">Session 3 of 4</small>' +
+    '</div>' +
+    '<div class="bb" data-s="waiting"><button class="flat">Start resting</button><button class="ghost">Snooze 2 min</button></div>' +
+    '<div class="bb" data-s="resting"><button class="ghost">+5 min</button><button class="ghost">Skip rest</button></div>' +
+    '<div class="bb" data-s="work"><button class="flat">Start working</button><button class="ghost">+5 min</button></div>' +
+    '<button class="x2" aria-label="Close">×</button>';
+
+  var MB = '<span><b>BreakBar</b></span><span><span class="gl"><i></i><i></i></span>9:41</span>';
+
+  $$('[data-pop]').forEach(function (el) { el.appendChild($('#t-pop').content.cloneNode(true)); });
+  $$('[data-set]').forEach(function (el) { el.appendChild($('#t-set').content.cloneNode(true)); });
+  $$('[data-cc="small"]').forEach(function (el) { el.innerHTML = cc('Close'); });
+  $$('[data-cc="max"]').forEach(function (el) { el.innerHTML = cc('Close · Esc', true); });
+  $$('[data-bn]').forEach(function (el) { el.innerHTML = BN; });
+  $$('[data-mb]').forEach(function (el) { el.innerHTML = MB; });
+  $$('[data-ov]').forEach(function (el) { el.innerHTML = '<button class="x" data-x>Close (Esc)</button><div class="cc">' + cc('') + '</div>'; });
+
+  /* state switchers */
+  function seg(id, apply, attr) {
+    var box = $(id);
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      $$('button', box).forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      apply(b.getAttribute(attr));
+    });
+  }
+  seg('#stateSeg', function (v) { $('#popovers').setAttribute('data-state', v); }, 'data-s');
+  seg('#winSeg', function (v) { $('#wins').setAttribute('data-st', v); }, 'data-st');
+
+  /* typed numbers: plain text, a box on hover (CSS), an input on click.
+     Return or click-away applies, Esc cancels, digits only, clamped to min..max. */
+  function editable(el, getRange, onCommit) {
+    el.addEventListener('click', function () {
+      if (el.dataset.editing) return;
+      el.dataset.editing = '1';
+      var input = document.createElement('input');
+      input.className = 'numin'; input.type = 'text'; input.inputMode = 'numeric';
+      input.setAttribute('aria-label', 'Minutes');
+      input.value = el.textContent.trim();
+      var done = false;
+      function finish(apply) {
+        if (done) return; done = true;
+        var n = parseInt(input.value, 10), r = getRange();
+        if (apply && !isNaN(n)) onCommit(Math.min(r[1], Math.max(r[0], n)));
+        input.remove(); el.hidden = false; delete el.dataset.editing;
+      }
+      input.addEventListener('input', function () { input.value = input.value.replace(/\D/g, '').slice(0, 4); });
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') finish(true);
+        else if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+      });
+      input.addEventListener('blur', function () { finish(true); });
+      el.hidden = true; el.after(input); input.focus(); input.select();   // typing replaces the old number
+    });
+  }
+
+  /* popover: three pills, one stepper (shared by the light and dark popovers) */
+  var vals = { work: 45, short: 10, long: 20 };
+  var names = { work: 'Work session', short: 'Short rest', long: 'Long rest' };
+  var open = null;
+  function render() {
+    $$('[data-pop]').forEach(function (p) {
+      $$('.pill', p).forEach(function (b) {
+        var k = b.getAttribute('data-k');
+        $('b', b).textContent = vals[k];
+        b.setAttribute('aria-pressed', open === k ? 'true' : 'false');
+      });
+      var st = $('.step', p);
+      st.hidden = !open;
+      if (open) { $('.lbl', st).textContent = names[open]; $('[data-pnum]', st).textContent = vals[open]; }
+    });
+  }
+  $$('[data-pop]').forEach(function (p) {
+    p.addEventListener('click', function (e) {
+      var pill = e.target.closest('.pill');
+      if (pill) { var k = pill.getAttribute('data-k'); open = open === k ? null : k; render(); return; }
+      var d = e.target.closest('[data-d]');
+      if (d && open) { vals[open] = Math.min(180, Math.max(1, vals[open] + Number(d.getAttribute('data-d')))); render(); }
+    });
+    editable($('[data-pnum]', p), function () { return [1, 180]; }, function (n) { if (open) { vals[open] = n; render(); } });
+  });
+  render();
+
+  /* settings: the same typed numbers, local to each mock-up */
+  $$('[data-snum]').forEach(function (el) {
+    editable(el, function () { return [Number(el.dataset.min), Number(el.dataset.max)]; }, function (n) { el.textContent = n; });
+  });
+
+  /* resting countdown */
+  var total = 600, left = 582;
+  function tick() {
+    left = left <= 0 ? total : left - 1;
+    var t = ('0' + Math.floor(left / 60)).slice(-2) + ':' + ('0' + (left % 60)).slice(-2);
+    $$('[data-clk]').forEach(function (c) { c.textContent = t; });
+    $$('[data-bar]').forEach(function (b) { b.style.width = Math.max(3, (1 - left / total) * 100) + '%'; });
+  }
+  tick();
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(tick, 1000);
+
+  /* full-screen previews */
+  var note = $('#fsNote');
+  function exit() { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen(); }
+  $$('[data-x]').forEach(function (b) { b.addEventListener('click', exit); });
+  $$('[data-full]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var el = $('.ov.' + b.getAttribute('data-full'));
+      note.textContent = '';
+      if (!el.requestFullscreen) { note.textContent = 'Full screen is not available in this browser.'; return; }
+      el.requestFullscreen().catch(function () { note.textContent = 'The browser blocked full screen here.'; });
+    });
+  });
+})();
+</script>
+<noscript><p style="padding:16px">This preview needs JavaScript to show the interactive mock-ups.</p></noscript>
+</body>
+</html>
