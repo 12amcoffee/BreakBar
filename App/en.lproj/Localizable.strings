@@ -81,3 +81,10 @@
 "Hide" = "Hide";
 "Preview" = "Preview";
 "Used for both the Rest and Start working windows. Esc or Close always dismisses a window." = "Used for both the Rest and Start working windows. Esc or Close always dismisses a window.";
+"Work" = "Work";
+"Short" = "Short";
+"Long" = "Long";
+"Close · Esc" = "Close · Esc";
+"%@ left" = "%@ left";
+"Decrease" = "Decrease";
+"Increase" = "Increase";

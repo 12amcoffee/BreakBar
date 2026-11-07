@@ -12,12 +12,15 @@ import BreakBarCore
 @MainActor
 final class PromptPresenter {
     private let controller: TimerController
-    private let model = PromptModel(spec: PromptSpec(kind: .rest, progress: .longBreak))
+    private let model = PromptModel(spec: PromptSpec(kind: .rest, progress: .longBreak,
+                                                      dots: DotProgress(done: 0, hasCurrent: false, total: 4)))
     private var live: PromptWindowSet?
     private var preview: PromptWindowSet?
     private var previewTimer: Timer?
     private var visible = false
     private var lastTag: String?
+    private var restTotal: TimeInterval = 1
+    private var lastEndsAt: Date?
     private var cancellable: AnyCancellable?
 
     init(controller: TimerController) {
@@ -47,16 +50,33 @@ final class PromptPresenter {
             default: visible = false
             }
         }
-        guard visible, let spec = PromptSpec(machine: machine) else {
+        trackRestLength(machine.state)
+        guard visible, var spec = PromptSpec(machine: machine) else {
             closeLive()
             return
         }
+        if spec.kind == .resting { spec.total = restTotal }
         model.spec = spec
         let style = machine.settings.windowStyle
         if live?.style != style {
             live?.close()
             live = PromptWindowSet(style: style, model: model, onEscape: { [weak self] in self?.hideLive() })
         }
+    }
+
+    /// The progress bar needs the whole length of this rest. The machine only knows when it ends, so
+    /// remember the length when a rest is first seen and add to it each time the rest is extended.
+    private func trackRestLength(_ state: TimerState) {
+        guard case .resting(_, let end) = state else {
+            lastEndsAt = nil
+            return
+        }
+        if let last = lastEndsAt {
+            if end > last { restTotal += end.timeIntervalSince(last) }       // extended
+        } else {
+            restTotal = max(1, end.timeIntervalSinceNow)                      // first sight of this rest
+        }
+        lastEndsAt = end
     }
 
     private func hideLive() {
@@ -75,6 +95,7 @@ final class PromptPresenter {
     func showPreview(_ style: PromptWindowStyle) {
         closePreview()
         let spec = PromptSpec(kind: .rest, progress: .done(2, of: 4, longBreakNext: false),
+                              dots: DotProgress(done: 2, hasCurrent: false, total: 4),
                               snoozeMinutes: controller.settings.snoozeMinutes, canSkip: true)
         let close: () -> Void = { [weak self] in self?.closePreview() }
         let model = PromptModel(spec: spec, handlers: PromptHandlers(primary: close, snooze: close, extend: close, skip: close, hide: close))

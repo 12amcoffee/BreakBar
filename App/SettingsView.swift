@@ -37,6 +37,7 @@ struct SettingsView: View {
             }
         }
         .frame(width: 460, height: 460)
+        .background(Color.surface)
         .tint(.tomato)
     }
 
@@ -118,6 +119,7 @@ private struct IntervalsTab: View {
             }
         }
         .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
     }
 }
 
@@ -162,6 +164,7 @@ private struct BreaksTab: View {
             }
         }
         .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
     }
 }
 
@@ -193,6 +196,7 @@ private struct WindowsTab: View {
             }
         }
         .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
     }
 }
 
@@ -214,6 +218,7 @@ private struct SoundsTab: View {
             }
         }
         .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
     }
 
     private func row(_ title: LocalizedStringKey, _ keyPath: WritableKeyPath<TimerSettings, Double>,
@@ -253,6 +258,7 @@ private struct GeneralTab: View {
                 }
         }
         .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
     }
 }
 

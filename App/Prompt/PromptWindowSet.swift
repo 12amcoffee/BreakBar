@@ -81,14 +81,14 @@ final class PromptWindowSet {
         let area = screen.visibleFrame
         switch style {
         case .small:
-            let size = NSSize(width: 400, height: 300)
+            let size = NSSize(width: 380, height: 330)
             return NSRect(x: area.midX - size.width / 2, y: area.midY - size.height / 2, width: size.width, height: size.height)
         case .maximised:
             return area.insetBy(dx: 40, dy: 40)
         case .fullScreen:
             return screen.frame
         case .banner:
-            let size = NSSize(width: 560, height: 84)
+            let size = NSSize(width: 580, height: 76)
             return NSRect(x: area.maxX - size.width - 16, y: area.maxY - size.height - 12, width: size.width, height: size.height)
         }
     }

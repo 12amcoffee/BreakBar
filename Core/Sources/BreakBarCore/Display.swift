@@ -13,6 +13,17 @@ public enum SessionProgress: Equatable, Sendable {
     case longBreakAfterThisSession
 }
 
+/// The row of session dots: `done` filled dots, then (if `hasCurrent`) one ring for the session in progress.
+public struct DotProgress: Equatable, Sendable {
+    public var done: Int
+    public var hasCurrent: Bool
+    public var total: Int
+
+    public init(done: Int, hasCurrent: Bool, total: Int) {
+        self.done = done; self.hasCurrent = hasCurrent; self.total = total
+    }
+}
+
 /// Which buttons make sense right now. Shared by the popover and the Rest window.
 public struct AvailableActions: Equatable, Sendable {
     public var canPause = false
@@ -67,6 +78,19 @@ extension TimerMachine {
         case .awaitingRest(let kind, _, _), .snoozed(let kind, _, _),
              .resting(let kind, _), .awaitingWork(let kind, _), .paused(.rest(let kind), _, _):
             return kind == .long ? .longBreak : .done(completedSessions, of: n, longBreakNext: longBreakPostponed)
+        }
+    }
+
+    /// Dots for the current set, e.g. 1 done + a ring + 2 empty while working on session 2 of 4.
+    public var dots: DotProgress {
+        let n = settings.sessionsPerSet
+        switch sessionProgress {
+        case .session(let current, _):
+            return DotProgress(done: min(max(current - 1, 0), n), hasCurrent: true, total: n)
+        case .done(let done, _, _):
+            return DotProgress(done: min(max(done, 0), n), hasCurrent: false, total: n)
+        case .longBreak, .longBreakAfterThisSession:
+            return DotProgress(done: n, hasCurrent: false, total: n)
         }
     }
 

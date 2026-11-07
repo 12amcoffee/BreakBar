@@ -29,6 +29,11 @@ final class StatusItemController: NSObject {
         )
         hosting.sizingOptions = [.preferredContentSize]   // popover grows/shrinks with its content (macOS 13+)
         popover.contentViewController = hosting
+        // The popover's arrow is drawn by the system and cannot take our warm colour, so hide it when the
+        // system lets us. The check keeps this from crashing if a future macOS removes the setting.
+        if popover.responds(to: NSSelectorFromString("setShouldHideAnchor:")) {
+            popover.setValue(true, forKey: "shouldHideAnchor")
+        }
 
         if let button = statusItem.button {
             button.imagePosition = .imageLeft

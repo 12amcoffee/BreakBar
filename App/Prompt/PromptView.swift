@@ -1,13 +1,17 @@
 import SwiftUI
 import BreakBarCore
 
-/// The content of every Rest / Start working window. `style` only changes size and layout.
+/// The content of every Rest / Start working window. `style` changes size and layout; the colours come from
+/// `BBPalette`: cream (light) or ink (dark) cards, and for the full-screen overlay a tomato screen (light)
+/// or an ink screen (dark).
 struct PromptView: View {
     @ObservedObject var model: PromptModel
     let style: PromptWindowStyle
+    @Environment(\.colorScheme) private var scheme
 
     private var spec: PromptSpec { model.spec }
     private var h: PromptHandlers { model.handlers }
+    private var palette: BBPalette { style == .fullScreen ? .overlay(scheme) : .surface(scheme) }
 
     var body: some View {
         content.tint(.tomato)
@@ -17,81 +21,170 @@ struct PromptView: View {
         switch style {
         case .banner:
             banner
+        case .small:
+            windowCard(base: 13.5)
+        case .maximised:
+            GeometryReader { geo in windowCard(base: min(geo.size.width, geo.size.height) * 0.034) }
         case .fullScreen:
-            ZStack {
-                Color.black.opacity(0.88)
-                card
-            }
-            .foregroundStyle(.white)
-            .environment(\.colorScheme, .dark)
-            .ignoresSafeArea()
-        case .small, .maximised:
-            card
+            GeometryReader { geo in fullScreen(base: min(geo.size.width, geo.size.height) * 0.033) }
+        }
+    }
+
+    // MARK: Small and maximised: a card
+
+    private func windowCard(base: CGFloat) -> some View {
+        let shape = RoundedRectangle(cornerRadius: base * 1.3, style: .continuous)
+        return stack(base: base, titleEm: 2, iconEm: 2.9, clockEm: 3.6, barEm: 16)
+            .padding(base * 1.7)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(palette.background, in: shape)
+            .overlay { shape.strokeBorder(palette.line, lineWidth: 1) }
+    }
+
+    // MARK: Full screen
+
+    private func fullScreen(base: CGFloat) -> some View {
+        ZStack(alignment: .topTrailing) {
+            palette.background.ignoresSafeArea()
+            stack(base: base, titleEm: 4.3, iconEm: 3.6, clockEm: 4.4, barEm: 14)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 18))
+            Button { h.hide() } label: {
+                Text("Close (Esc)")
+                    .font(.system(size: base * 0.8))
+                    .padding(.horizontal, base * 0.7)
+                    .padding(.vertical, base * 0.35)
+                    .background(palette.control, in: Capsule())
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(palette.text)
+            .keyboardShortcut(.cancelAction)
+            .padding(base * 1.2)
         }
     }
 
-    // MARK: Layouts
+    // MARK: Shared stack
 
-    private var scale: CGFloat {
-        switch style {
-        case .small, .banner: return 1
-        case .maximised: return 1.8
-        case .fullScreen: return 2.2
+    private func stack(base: CGFloat, titleEm: CGFloat, iconEm: CGFloat, clockEm: CGFloat, barEm: CGFloat) -> some View {
+        VStack(spacing: base * 0.9) {
+            Image(systemName: symbol)
+                .font(.system(size: base * iconEm, weight: .regular))
+                .foregroundStyle(palette.icon)
+            Text(title)
+                .font(.system(size: base * titleEm, weight: .semibold))
+            if spec.kind == .resting {
+                countdown(size: base * clockEm)
+                progressBar(width: base * barEm, height: base * 0.35)
+            }
+            HStack(spacing: base * 0.7) {
+                SessionDots(dots: spec.dots, palette: palette, size: base * 0.7)
+                progressText(spec.progress)
+            }
+            .font(.system(size: base * 0.95))
+            .foregroundStyle(palette.secondaryText)
+            buttons(base: base)
+            if style != .fullScreen && spec.kind != .resting { closeLink(base: base) }
+        }
+        .foregroundStyle(palette.text)
+    }
+
+    private func buttons(base: CGFloat) -> some View {
+        VStack(spacing: base * 0.6) {
+            if spec.kind != .resting {
+                Button(primaryTitle) { h.primary() }
+                    .buttonStyle(BBButtonStyle(role: .primary, palette: palette, size: base, fillWidth: true))
+                    .keyboardShortcut(.defaultAction)
+            }
+            HStack(spacing: base * 0.6) {
+                if let m = spec.snoozeMinutes { Button("Snooze \(m) min") { h.snooze() } }
+                if let m = spec.extendMinutes { Button("+\(m) min") { h.extend() } }
+                if spec.canSkip { Button("Skip rest") { h.skip() } }
+                if spec.kind == .resting { hideButton }
+            }
+            .buttonStyle(BBButtonStyle(role: .secondary, palette: palette, size: base))
+        }
+        .frame(maxWidth: base * 24)
+    }
+
+    /// While resting, "Hide" is the way out. Esc does the same, except on the full-screen overlay,
+    /// which has its own Close (Esc) button.
+    @ViewBuilder private var hideButton: some View {
+        if style == .fullScreen {
+            Button("Hide") { h.hide() }
+        } else {
+            Button("Hide") { h.hide() }.keyboardShortcut(.cancelAction)
         }
     }
 
-    private var card: some View {
-        VStack(spacing: 14 * scale) {
-            Image(systemName: symbol).font(.system(size: 40 * scale))
-            Text(title).font(.system(size: 30 * scale, weight: .semibold))
-            if spec.kind == .resting { countdown(size: 54 * scale) }
-            progressText(spec.progress).font(.system(size: 15 * scale)).foregroundStyle(.secondary)
-            HStack(spacing: 10) { buttons }
-                .controlSize(.large)
-                .padding(.top, 6 * scale)
-        }
-        .padding(28 * scale)
+    private func closeLink(base: CGFloat) -> some View {
+        Button { h.hide() } label: { Text("Close · Esc") }
+            .buttonStyle(.plain)
+            .font(.system(size: base * 0.85))
+            .foregroundStyle(palette.secondaryText)
+            .keyboardShortcut(.cancelAction)
     }
+
+    // MARK: Banner
 
     private var banner: some View {
-        HStack(spacing: 12) {
-            Image(systemName: symbol).font(.system(size: 26))
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.headline)
-                if spec.kind == .resting { countdown(size: 15) } else { progressText(spec.progress).font(.subheadline).foregroundStyle(.secondary) }
+        let shape = RoundedRectangle(cornerRadius: 14, style: .continuous)
+        return HStack(spacing: 12) {
+            Image(systemName: symbol)
+                .font(.system(size: 24))
+                .foregroundStyle(palette.icon)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title).font(.system(size: 13, weight: .semibold))
+                bannerSubtitle
+                    .font(.system(size: 12))
+                    .foregroundStyle(palette.secondaryText)
             }
             Spacer(minLength: 8)
-            HStack(spacing: 6) { buttons }.controlSize(.small)
+            HStack(spacing: 6) { bannerButtons }
+            Button { h.hide() } label: { Image(systemName: "xmark").font(.system(size: 11, weight: .semibold)) }
+                .buttonStyle(.plain)
+                .foregroundStyle(palette.secondaryText)
+                .keyboardShortcut(.cancelAction)
+                .accessibilityLabel("Close")
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 14)
+        .foregroundStyle(palette.text)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+        .background(palette.background, in: shape)
+        .overlay { shape.strokeBorder(palette.line, lineWidth: 1) }
+    }
+
+    @ViewBuilder private var bannerSubtitle: some View {
+        if spec.kind == .resting {
+            TimelineView(.periodic(from: .now, by: 1)) { context in
+                Text("\(clock(at: context.date)) left").monospacedDigit()
+            }
+        } else {
+            progressText(spec.progress)
+        }
+    }
+
+    @ViewBuilder private var bannerButtons: some View {
+        if spec.kind != .resting {
+            Button(primaryTitle) { h.primary() }
+                .buttonStyle(BBButtonStyle(role: .primary, palette: palette, size: 12))
+        }
+        if let m = spec.snoozeMinutes {
+            Button("Snooze \(m) min") { h.snooze() }
+                .buttonStyle(BBButtonStyle(role: .secondary, palette: palette, size: 12))
+        }
+        if let m = spec.extendMinutes {
+            Button("+\(m) min") { h.extend() }
+                .buttonStyle(BBButtonStyle(role: .secondary, palette: palette, size: 12))
+        }
+        if spec.kind == .resting && spec.canSkip {
+            Button("Skip rest") { h.skip() }
+                .buttonStyle(BBButtonStyle(role: .secondary, palette: palette, size: 12))
+        }
     }
 
     // MARK: Pieces
 
-    @ViewBuilder private var buttons: some View {
-        if spec.kind != .resting {
-            Button(primaryTitle) { h.primary() }
-                .buttonStyle(.borderedProminent)
-                .keyboardShortcut(.defaultAction)
-        }
-        if let m = spec.snoozeMinutes { Button("Snooze \(m) min") { h.snooze() } }
-        if let m = spec.extendMinutes { Button("+\(m) min") { h.extend() } }
-        if spec.canSkip { Button("Skip rest") { h.skip() } }
-        Button(closeTitle) { h.hide() }
-            .keyboardShortcut(.cancelAction)           // Esc
-    }
-
     private var primaryTitle: LocalizedStringKey {
         spec.kind == .rest ? "Start resting" : "Start working"
-    }
-
-    private var closeTitle: LocalizedStringKey {
-        if style == .fullScreen { return "Close (Esc)" }
-        return spec.kind == .resting ? "Hide" : "Close"
     }
 
     private var title: LocalizedStringKey {
@@ -103,14 +196,33 @@ struct PromptView: View {
     }
 
     private var symbol: String {
-        spec.kind == .work ? "hourglass" : (spec.longBreak ? "bed.double.fill" : "cup.and.saucer.fill")
+        if spec.kind == .work { return "hourglass" }
+        return spec.longBreak ? "bed.double" : "cup.and.saucer"
+    }
+
+    private func clock(at date: Date) -> String {
+        let seconds = (spec.endsAt ?? date).timeIntervalSince(date).rounded(.up)
+        return formatClock(Int(seconds))
     }
 
     private func countdown(size: CGFloat) -> some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
-            let left = (spec.endsAt ?? context.date).timeIntervalSince(context.date).rounded(.up)
-            Text(verbatim: formatClock(Int(left)))
-                .font(.system(size: size, weight: .light).monospacedDigit())
+            Text(verbatim: clock(at: context.date))
+                .font(.system(size: size, weight: .light, design: .monospaced))
+                .monospacedDigit()
+        }
+    }
+
+    private func progressBar(width: CGFloat, height: CGFloat) -> some View {
+        TimelineView(.periodic(from: .now, by: 1)) { context in
+            let total = max(spec.total ?? 1, 1)
+            let left = max(0, (spec.endsAt ?? context.date).timeIntervalSince(context.date))
+            let fraction = min(1, max(0.03, 1 - left / total))
+            ZStack(alignment: .leading) {
+                Capsule().fill(palette.barTrack)
+                Capsule().fill(palette.barFill).frame(width: width * fraction)
+            }
+            .frame(width: width, height: height)
         }
     }
 }

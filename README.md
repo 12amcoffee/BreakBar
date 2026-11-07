@@ -16,6 +16,13 @@ click **Start resting**.
   <sub>macOS 13 or later · Apple silicon and Intel · free</sub>
 </p>
 
+## What's new in 2.0
+
+- **Intervals in the dropdown.** Work, short rest and long rest sit under the Start button as three pills; click one to adjust it with a stepper.
+- **Warm look.** Cream in light mode and ink in dark mode across the popover, Settings and the Rest windows, with flat tomato buttons.
+- **Redrawn Rest windows.** All four styles (small, maximised, banner, full screen) now show session dots, a rest countdown with a progress bar, and a "Break is over" window to start work. The full-screen overlay is a tomato screen in light mode and an ink screen in dark mode.
+- **Tidier popover.** The empty gap under "Session 1 of 4" is gone.
+
 ## Why I made this
 
 I made BreakBar because of one very normal study session. I was in the library, doing problem sets

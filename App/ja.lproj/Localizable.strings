@@ -81,3 +81,10 @@
 "Hide" = "隠す";
 "Preview" = "プレビュー";
 "Used for both the Rest and Start working windows. Esc or Close always dismisses a window." = "「休憩」と「作業開始」の両方のウィンドウに使われます。Esc または「閉じる」でいつでも閉じられます。";
+"Work" = "作業";
+"Short" = "短め";
+"Long" = "長め";
+"Close · Esc" = "閉じる · Esc";
+"%@ left" = "残り %@";
+"Decrease" = "減らす";
+"Increase" = "増やす";

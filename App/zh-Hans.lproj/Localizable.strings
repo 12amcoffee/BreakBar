@@ -81,3 +81,10 @@
 "Hide" = "隐藏";
 "Preview" = "预览";
 "Used for both the Rest and Start working windows. Esc or Close always dismisses a window." = "同时用于“休息”和“开始工作”窗口。按 Esc 或点击“关闭”随时可关闭窗口。";
+"Work" = "工作";
+"Short" = "短休";
+"Long" = "长休";
+"Close · Esc" = "关闭 · Esc";
+"%@ left" = "剩余 %@";
+"Decrease" = "减少";
+"Increase" = "增加";

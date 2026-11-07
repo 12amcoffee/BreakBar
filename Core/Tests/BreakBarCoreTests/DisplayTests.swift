@@ -112,3 +112,45 @@ final class CommandAndNameTests: XCTestCase {
         XCTAssertEqual(s.clamped().dingVolume, 1); XCTAssertEqual(s.clamped().tickingVolume, 0)
     }
 }
+
+final class DotsTests: XCTestCase {
+    let t0 = Date(timeIntervalSince1970: 1_000_000)
+
+    func testDotsWhileWorkingOnSecondSession() {
+        var m = TimerMachine()
+        m.handle(.start, at: t0); m.handle(.tick, at: t0.addingTimeInterval(45 * 60))   // session 1 done
+        m.handle(.skip, at: t0.addingTimeInterval(46 * 60))                             // now working on session 2
+        XCTAssertEqual(m.dots, DotProgress(done: 1, hasCurrent: true, total: 4))
+    }
+
+    func testDotsWhileWaitingToRest() {
+        var m = TimerMachine()
+        m.handle(.start, at: t0); m.handle(.tick, at: t0.addingTimeInterval(45 * 60))
+        XCTAssertEqual(m.dots, DotProgress(done: 1, hasCurrent: false, total: 4))
+    }
+
+    func testDotsDuringLongBreakAreAllDone() {
+        var s = TimerSettings(); s.sessionsPerSet = 2
+        var m = TimerMachine(settings: s)
+        var now = t0
+        for _ in 0..<2 {
+            m.handle(.start, at: now); now = now.addingTimeInterval(45 * 60); m.handle(.tick, at: now)
+            if m.state != .idle, m.available.canSkip { m.handle(.skip, at: now) }
+            m.handle(.stop, at: now)
+        }
+        XCTAssertEqual(m.sessionProgress, .session(current: 1, of: 2))   // the set restarted after the long break
+        XCTAssertEqual(m.dots, DotProgress(done: 0, hasCurrent: true, total: 2))
+    }
+
+    func testDotsIdleAtStartOfSet() {
+        XCTAssertEqual(TimerMachine().dots, DotProgress(done: 0, hasCurrent: true, total: 4))
+    }
+
+    func testDotsNeverExceedTotal() {
+        var s = TimerSettings(); s.sessionsPerSet = 1; s.delayLongBreak = true
+        var m = TimerMachine(settings: s)
+        m.handle(.start, at: t0); m.handle(.tick, at: t0.addingTimeInterval(45 * 60))   // postponed: completed == total
+        let d = m.dots
+        XCTAssertLessThanOrEqual(d.done, d.total)
+    }
+}

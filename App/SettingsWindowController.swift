@@ -22,6 +22,8 @@ final class SettingsWindowController {
             w.title = String(localized: "Settings")
             w.styleMask = [.titled, .closable]
             w.isReleasedWhenClosed = false
+            w.titlebarAppearsTransparent = true      // let the warm background run up behind the title
+            w.backgroundColor = .bbSurface
             w.center()
             window = w
         }
