@@ -89,3 +89,6 @@
 "Decrease" = "減らす";
 "Increase" = "増やす";
 "min" = "分";
+"Press Return to start resting" = "Return キーで休憩を始める";
+"Press Return to start working" = "Return キーで作業を始める";
+"Press Esc to hide" = "Esc キーで非表示";

@@ -88,22 +88,40 @@ struct PromptView: View {
     }
 
     private func buttons(base: CGFloat) -> some View {
-        VStack(spacing: base * 0.6) {
+        // The maximised window scales its text with the screen but keeps its buttons the size of the
+        // small window's, so they stay a comfortable size to click.
+        let size: CGFloat = style == .maximised ? 13.5 : base
+        return VStack(spacing: size * 0.6) {
             if spec.kind != .resting {
                 Button(primaryTitle) { h.primary() }
-                    // No Return-key shortcut here: a window that pops up while you type must not be
-                    // answered by a stray Return. Use the "answer window" hotkey for a keyboard route.
-                    .buttonStyle(BBButtonStyle(role: .primary, palette: palette, size: base, fillWidth: true))
+                    .buttonStyle(BBButtonStyle(role: .primary, palette: palette, size: size, fillWidth: true))
+                    // Return answers the maximised window. Not the others: a small window or banner that
+                    // pops up while you type must not be answered by a stray Return.
+                    .returnShortcut(style == .maximised)
             }
-            HStack(spacing: base * 0.6) {
+            HStack(spacing: size * 0.6) {
                 if let m = spec.snoozeMinutes { Button("Snooze \(m) min") { h.snooze() } }
                 if let m = spec.extendMinutes { Button("+\(m) min") { h.extend() } }
                 if spec.canSkip { Button("Skip rest") { h.skip() } }
                 if spec.kind == .resting { hideButton }
             }
-            .buttonStyle(BBButtonStyle(role: .secondary, palette: palette, size: base))
+            .buttonStyle(BBButtonStyle(role: .secondary, palette: palette, size: size))
+            if style == .maximised { keyHint(base: base) }
         }
-        .frame(maxWidth: base * 24)
+        .frame(maxWidth: size * 24)
+    }
+
+    /// The one-line reminder of which key does what, shown on the maximised window.
+    private func keyHint(base: CGFloat) -> some View {
+        Group {
+            switch spec.kind {
+            case .rest: Text("Press Return to start resting")
+            case .work: Text("Press Return to start working")
+            case .resting: Text("Press Esc to hide")
+            }
+        }
+        .font(.system(size: base * 0.75))
+        .foregroundStyle(palette.secondaryText)
     }
 
     /// While resting, "Hide" is the way out. Esc does the same on the maximised window; the small window
@@ -234,6 +252,15 @@ struct PromptView: View {
 }
 
 private extension View {
+    /// Return triggers this button, when `on`.
+    @ViewBuilder func returnShortcut(_ on: Bool) -> some View {
+        if on {
+            self.keyboardShortcut(.defaultAction)
+        } else {
+            self
+        }
+    }
+
     /// Esc triggers this button, when `on`.
     @ViewBuilder func escapeShortcut(_ on: Bool) -> some View {
         if on {

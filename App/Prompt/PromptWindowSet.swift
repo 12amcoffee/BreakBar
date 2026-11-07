@@ -24,6 +24,8 @@ final class PromptPanel: NSPanel {
 final class PromptWindowSet {
     let style: PromptWindowStyle
     private var panels: [PromptPanel] = []
+    /// The app that was in front before this window took the keyboard (maximised and full screen only).
+    private var previousApp: NSRunningApplication?
 
     init(style: PromptWindowStyle, model: PromptModel, onEscape: @escaping () -> Void) {
         self.style = style
@@ -51,8 +53,15 @@ final class PromptWindowSet {
     }
 
     func close() {
+        let wasActive = NSApp.isActive
         panels.forEach { $0.orderOut(nil); $0.close() }
         panels = []
+        // We took the keyboard from the app you were working in; give it back, unless you have
+        // already moved on to something else.
+        if wasActive, let app = previousApp, !app.isTerminated {
+            app.activate(options: [])
+        }
+        previousApp = nil
     }
 
     // MARK: Showing
@@ -73,6 +82,8 @@ final class PromptWindowSet {
         case .small:
             panels.first?.orderFrontRegardless()          // click-only: never takes the keyboard from what you are typing
         case .maximised, .fullScreen:
+            let front = NSWorkspace.shared.frontmostApplication
+            if front?.processIdentifier != ProcessInfo.processInfo.processIdentifier { previousApp = front }
             NSApp.activate(ignoringOtherApps: true)       // so Esc works straight away
             panels.first?.makeKeyAndOrderFront(nil)
             panels.dropFirst().forEach { $0.orderFrontRegardless() }

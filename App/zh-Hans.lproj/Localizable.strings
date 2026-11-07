@@ -89,3 +89,6 @@
 "Decrease" = "减少";
 "Increase" = "增加";
 "min" = "分钟";
+"Press Return to start resting" = "按回车键开始休息";
+"Press Return to start working" = "按回车键开始工作";
+"Press Esc to hide" = "按 Esc 键隐藏";

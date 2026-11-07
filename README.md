@@ -184,14 +184,14 @@ prompts never appear.
 ## Windows
 
 All four styles float above other apps, follow you across Spaces and appear over full-screen apps.
-Every style has a Close button (or ×); Esc also closes the maximised window and the full-screen overlay.
+Every style has a Close button (or ×); Esc also closes the maximised window and the full-screen overlay (and returns you to the app you were using), and Return answers the maximised window.
 *Preview* buttons in Settings > Windows show each style with sample data (a preview closes itself
 after 12 s and never touches the timer).
 
 | Style | Behaviour |
 |---|---|
 | Small floating window | centred card; click-only, never takes the keyboard from what you are typing (use the answer hotkey from the keyboard) |
-| Maximised floating window | nearly full screen; menu bar and Dock stay visible; takes focus so Esc closes it |
+| Maximised floating window | nearly full screen; menu bar and Dock stay visible; takes focus, so Return starts the rest (or the work) and Esc closes it, handing focus back to the app you were using |
 | Full-screen overlay | dims every display (tomato in light mode, ink in dark); "Close (Esc)" button; takes focus so Esc closes it |
 | Notification-style banner | slides in at top right; click-only (× button); own window, not a system notification |
 
