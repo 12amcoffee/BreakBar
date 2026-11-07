@@ -13,7 +13,7 @@ extension Color {
 
     static let tomato = Color(hex: 0xE5432B)
     static let tomatoPress = Color(hex: 0xCC3A24)
-    static let cream = Color(hex: 0xFFF4E6)
+    static let cream = Color(hex: 0xFFF9F2)
     static let ink = Color(hex: 0x1F1A17)
     static let restPink = Color(hex: 0xFFC9BB)
 
@@ -30,7 +30,7 @@ extension NSColor {
     }
 
     static let bbSurface = adaptive(
-        light: NSColor(srgbRed: 1.0, green: 0.957, blue: 0.902, alpha: 1),        // cream #FFF4E6
+        light: NSColor(srgbRed: 1.0, green: 0.976, blue: 0.949, alpha: 1),        // cream #FFF9F2
         dark: NSColor(srgbRed: 0.122, green: 0.102, blue: 0.090, alpha: 1))       // ink   #1F1A17
 }
 
@@ -58,11 +58,11 @@ struct BBPalette {
         if scheme == .dark {
             return BBPalette(
                 background: .ink, text: Color(hex: 0xF3EDE7), secondaryText: Color(hex: 0xF3EDE7, opacity: 0.62),
-                line: Color(hex: 0xFFF4E6, opacity: 0.14), control: Color(hex: 0xFFF4E6, opacity: 0.12),
+                line: Color(hex: 0xFFF9F2, opacity: 0.14), control: Color(hex: 0xFFF9F2, opacity: 0.12),
                 hover: Color(hex: 0xE5432B, opacity: 0.26),
                 primaryFill: .tomato, primaryPressed: .tomatoPress, primaryLabel: .cream,
-                dotDone: .tomato, dotOff: Color(hex: 0xFFF4E6, opacity: 0.22), icon: .tomato,
-                barTrack: Color(hex: 0xFFF4E6, opacity: 0.12), barFill: .restPink)
+                dotDone: .tomato, dotOff: Color(hex: 0xFFF9F2, opacity: 0.22), icon: .tomato,
+                barTrack: Color(hex: 0xFFF9F2, opacity: 0.12), barFill: .restPink)
         }
         return BBPalette(
             background: .cream, text: .ink, secondaryText: Color(hex: 0x1F1A17, opacity: 0.62),
@@ -77,20 +77,20 @@ struct BBPalette {
         if scheme == .dark {                                   // B: ink screen, tomato button
             return BBPalette(
                 background: .ink, text: .cream, secondaryText: Color(hex: 0xF3EDE7, opacity: 0.7),
-                line: Color(hex: 0xFFF4E6, opacity: 0.2), control: Color(hex: 0xFFF4E6, opacity: 0.12),
+                line: Color(hex: 0xFFF9F2, opacity: 0.2), control: Color(hex: 0xFFF9F2, opacity: 0.12),
                 hover: Color(hex: 0xE5432B, opacity: 0.3),
                 primaryFill: .tomato, primaryPressed: .tomatoPress, primaryLabel: .cream,
-                dotDone: .tomato, dotOff: Color(hex: 0xFFF4E6, opacity: 0.22), icon: .tomato,
-                barTrack: Color(hex: 0xFFF4E6, opacity: 0.28), barFill: .restPink,
-                outline: Color(hex: 0xFFF4E6, opacity: 0.5))
+                dotDone: .tomato, dotOff: Color(hex: 0xFFF9F2, opacity: 0.22), icon: .tomato,
+                barTrack: Color(hex: 0xFFF9F2, opacity: 0.28), barFill: .restPink,
+                outline: Color(hex: 0xFFF9F2, opacity: 0.5))
         }
         return BBPalette(                                      // A: tomato screen, cream button
             background: .tomato, text: .cream, secondaryText: .cream,
-            line: Color(hex: 0xFFF4E6, opacity: 0.3), control: Color(hex: 0xFFF4E6, opacity: 0.16),
+            line: Color(hex: 0xFFF9F2, opacity: 0.3), control: Color(hex: 0xFFF9F2, opacity: 0.16),
             hover: Color(hex: 0xFFC9BB, opacity: 0.28),
             primaryFill: .cream, primaryPressed: .white, primaryLabel: .ink,
-            dotDone: .cream, dotOff: Color(hex: 0xFFF4E6, opacity: 0.4), icon: .cream,
-            barTrack: Color(hex: 0xFFF4E6, opacity: 0.28), barFill: .restPink,
-            outline: Color(hex: 0xFFF4E6, opacity: 0.5))
+            dotDone: .cream, dotOff: Color(hex: 0xFFF9F2, opacity: 0.4), icon: .cream,
+            barTrack: Color(hex: 0xFFF9F2, opacity: 0.28), barFill: .restPink,
+            outline: Color(hex: 0xFFF9F2, opacity: 0.5))
     }
 }

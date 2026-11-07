@@ -111,7 +111,7 @@ App/     the macOS app: menu bar, popover, Settings, windows, sounds, notificati
   Prompt/  the Rest / Start working windows (4 styles)
   *.lproj  English, Chinese (Simplified), Japanese strings
   Assets.xcassets  app icon, menu bar glyph (template image), accent colour
-Design/  logo, masters and editable SVG sources (tomato #E5432B, cream #FFF4E6)
+Design/  logo, masters and editable SVG sources (tomato #E5432B, cream #FFF9F2)
 packaging/  Homebrew cask template, DMG layout settings
 scripts/ make-sounds.py (synthesises the sounds), check-strings.py
 project.yml  XcodeGen spec
