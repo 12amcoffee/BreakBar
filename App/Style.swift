@@ -76,3 +76,60 @@ struct SessionDots: View {
         }
     }
 }
+
+/// A small number box: click, type a value, press Return (or click away) to apply it.
+/// Only digits are accepted, and the value is clamped to `range` (the settings clamp it again on save).
+struct NumberField: View {
+    @Binding var value: Int
+    let range: ClosedRange<Int>
+    var width: CGFloat = 46
+    var fill: Color = Color.primary.opacity(0.08)
+    var autoFocus = false
+    @State private var text = ""
+    @FocusState private var focused: Bool
+
+    var body: some View {
+        TextField("", text: $text)
+            .textFieldStyle(.plain)
+            .multilineTextAlignment(.trailing)
+            .monospacedDigit()
+            .focused($focused)
+            .frame(width: width)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 3)
+            .background(fill, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .strokeBorder(Color.tomato, lineWidth: focused ? 1.5 : 0)
+            }
+            .onAppear {
+                text = String(value)
+                if autoFocus { focused = true }
+            }
+            .onChange(of: value) { newValue in
+                // The value also changes from the − / + buttons and from clamping: keep the box in step.
+                if Int(text) != newValue { text = String(newValue) }
+            }
+            .onChange(of: text) { newText in
+                let digits = String(newText.filter { $0.isASCII && $0.isNumber }.prefix(4))
+                if digits != newText { text = digits }
+            }
+            .onChange(of: focused) { isFocused in
+                if !isFocused { commit() }
+            }
+            .onSubmit {
+                commit()
+                focused = false
+            }
+    }
+
+    private func commit() {
+        guard let typed = Int(text) else {
+            text = String(value)                      // empty or unreadable: put the old value back
+            return
+        }
+        let clamped = min(range.upperBound, max(range.lowerBound, typed))
+        if clamped != value { value = clamped }
+        text = String(clamped)
+    }
+}

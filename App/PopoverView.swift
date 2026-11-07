@@ -9,6 +9,7 @@ struct PopoverView: View {
     let openSettings: () -> Void
     @Environment(\.colorScheme) private var scheme
     @State private var hoveringMainButton = false
+    @State private var openInterval: Interval?
 
     private var machine: TimerMachine { controller.machine }
     private var actions: AvailableActions { machine.available }
@@ -33,7 +34,7 @@ struct PopoverView: View {
 
             if hasActions { contextualActions }
 
-            IntervalsRow(controller: controller, palette: palette)
+            IntervalsRow(controller: controller, palette: palette, open: $openInterval)
 
             Rectangle().fill(palette.line).frame(height: 1)
 
@@ -55,7 +56,7 @@ struct PopoverView: View {
             }
         }
         .padding(12)
-        .frame(width: 264)
+        .frame(width: 272)
         .foregroundStyle(palette.text)
         .background(palette.background)
         .tint(.tomato)
@@ -75,7 +76,7 @@ struct PopoverView: View {
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(BBButtonStyle(role: .primary, palette: palette, size: 13, fillWidth: true))
-        .keyboardShortcut(.defaultAction)
+        .defaultShortcut(openInterval == nil)      // Return belongs to the number box while it is open
         .onHover { hoveringMainButton = $0 }
     }
 
@@ -113,41 +114,42 @@ struct PopoverView: View {
 
 // MARK: - Intervals: three pills, one stepper
 
+private enum Interval: CaseIterable, Identifiable {
+    case work, short, long
+
+    var id: Self { self }
+
+    var keyPath: WritableKeyPath<TimerSettings, Int> {
+        switch self {
+        case .work: return \.workMinutes
+        case .short: return \.shortRestMinutes
+        case .long: return \.longRestMinutes
+        }
+    }
+
+    var pillLabel: LocalizedStringKey {
+        switch self {
+        case .work: return "Work"
+        case .short: return "Short"
+        case .long: return "Long"
+        }
+    }
+
+    var fullLabel: LocalizedStringKey {
+        switch self {
+        case .work: return "Work session"
+        case .short: return "Short rest"
+        case .long: return "Long rest"
+        }
+    }
+}
+
+
 /// Work / short rest / long rest as three pills. Click a pill to open its stepper; click it again to fold it away.
 private struct IntervalsRow: View {
     @ObservedObject var controller: TimerController
     let palette: BBPalette
-    @State private var open: Interval?
-
-    private enum Interval: CaseIterable, Identifiable {
-        case work, short, long
-
-        var id: Self { self }
-
-        var keyPath: WritableKeyPath<TimerSettings, Int> {
-            switch self {
-            case .work: return \.workMinutes
-            case .short: return \.shortRestMinutes
-            case .long: return \.longRestMinutes
-            }
-        }
-
-        var pillLabel: LocalizedStringKey {
-            switch self {
-            case .work: return "Work"
-            case .short: return "Short"
-            case .long: return "Long"
-            }
-        }
-
-        var fullLabel: LocalizedStringKey {
-            switch self {
-            case .work: return "Work session"
-            case .short: return "Short rest"
-            case .long: return "Long rest"
-            }
-        }
-    }
+    @Binding var open: Interval?
 
     var body: some View {
         VStack(spacing: 8) {
@@ -168,17 +170,19 @@ private struct IntervalsRow: View {
     }
 
     private func stepper(for interval: Interval) -> some View {
-        let minutes = controller.settings[keyPath: interval.keyPath]
-        return HStack(spacing: 8) {
+        HStack(spacing: 6) {
             Text(interval.fullLabel)
-            Spacer()
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+            Spacer(minLength: 4)
             StepButton(systemName: "minus", label: "Decrease", palette: palette) { adjust(interval, by: -1) }
-            Text("\(minutes) min")
-                .monospacedDigit()
-                .frame(minWidth: 56)
+            NumberField(value: controller.binding(interval.keyPath), range: 1...180, width: 34,
+                        fill: palette.control, autoFocus: true)
+            Text("min").foregroundStyle(palette.secondaryText)
             StepButton(systemName: "plus", label: "Increase", palette: palette) { adjust(interval, by: 1) }
         }
         .padding(.horizontal, 4)
+        .id(interval)                                 // a fresh box (and focus) for each pill
     }
 
     private func adjust(_ interval: Interval, by delta: Int) {
@@ -283,6 +287,15 @@ private struct MenuRow: View {
 }
 
 private extension View {
+    /// Makes this the window's default (Return) button, or not.
+    @ViewBuilder func defaultShortcut(_ enabled: Bool) -> some View {
+        if enabled {
+            self.keyboardShortcut(.defaultAction)
+        } else {
+            self
+        }
+    }
+
     /// ⌘ + key, when there is a key.
     @ViewBuilder func commandShortcut(_ key: KeyEquivalent?) -> some View {
         if let key {

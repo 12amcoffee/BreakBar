@@ -74,7 +74,7 @@ extension TimerController {
     }
 }
 
-/// "Work session ......... 45 min [- +]"
+/// "Work session ......... [ 45 ] min [- +]": type a number, or use the arrows.
 private struct MinutesStepper: View {
     let title: LocalizedStringKey
     @Binding var value: Int
@@ -82,12 +82,28 @@ private struct MinutesStepper: View {
     var step = 1
 
     var body: some View {
-        Stepper(value: $value, in: range, step: step) {
-            HStack {
-                Text(title)
-                Spacer()
-                Text("\(value) min").monospacedDigit().foregroundStyle(.secondary)
-            }
+        HStack(spacing: 8) {
+            Text(title)
+            Spacer()
+            NumberField(value: $value, range: range, width: 44)
+            Text("min").foregroundStyle(.secondary)
+            Stepper("", value: $value, in: range, step: step).labelsHidden()
+        }
+    }
+}
+
+/// A plain count (no unit), typed or stepped.
+private struct CountStepper: View {
+    let title: LocalizedStringKey
+    @Binding var value: Int
+    let range: ClosedRange<Int>
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Text(title)
+            Spacer()
+            NumberField(value: $value, range: range, width: 44)
+            Stepper("", value: $value, in: range).labelsHidden()
         }
     }
 }
@@ -105,13 +121,7 @@ private struct IntervalsTab: View {
                 MinutesStepper(title: "Long rest", value: controller.binding(\.longRestMinutes), range: TimerSettings.restRange)
             }
             Section("Long break") {
-                Stepper(value: controller.binding(\.sessionsPerSet), in: TimerSettings.setRange) {
-                    HStack {
-                        Text("Sessions per set")
-                        Spacer()
-                        Text("\(controller.settings.sessionsPerSet)").monospacedDigit().foregroundStyle(.secondary)
-                    }
-                }
+                CountStepper(title: "Sessions per set", value: controller.binding(\.sessionsPerSet), range: TimerSettings.setRange)
                 Toggle("Delay long break by one session", isOn: controller.binding(\.delayLongBreak))
                 Text("When a long break is due, take a short one now and the long one after the next work session.")
                     .font(.caption).foregroundStyle(.secondary)
@@ -153,13 +163,7 @@ private struct BreaksTab: View {
                 Toggle("Allow snoozing rest", isOn: controller.binding(\.snoozeEnabled))
                 if s.snoozeEnabled {
                     MinutesStepper(title: "Snooze for", value: controller.binding(\.snoozeMinutes), range: 1...60)
-                    Stepper(value: controller.binding(\.maxSnoozesPerBreak), in: 1...20) {
-                        HStack {
-                            Text("Max snoozes per break")
-                            Spacer()
-                            Text("\(s.maxSnoozesPerBreak)").monospacedDigit().foregroundStyle(.secondary)
-                        }
-                    }
+                    CountStepper(title: "Max snoozes per break", value: controller.binding(\.maxSnoozesPerBreak), range: 1...20)
                 }
             }
         }
