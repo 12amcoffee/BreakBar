@@ -21,10 +21,10 @@ click <b>Start resting</b>.
 </p>
 
 <p align="center">
-  <b>About 3.4 MB once installed.</b> It runs one small timer, with no network use,
+  <b>About 4.3 MB once installed.</b> It runs one small timer, with no network use,
   so it stays light on your Mac.
   <br>
-  <sub>Installer (DMG): 1.1 MB · Source code: 350 KB (zip)</sub>
+  <sub>Installer (DMG): 1.4 MB · Source code: 2.6 MB (zip, mostly the images in this README)</sub>
 </p>
 
 <p align="center">
