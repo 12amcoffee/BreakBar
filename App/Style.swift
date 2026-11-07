@@ -103,7 +103,13 @@ struct NumberField: View {
                     .multilineTextAlignment(.trailing)
                     .monospacedDigit()
                     .focused($focused)
-                    .onAppear { focused = true }
+                    .onAppear {
+                        focused = true
+                        // Select the old number, so typing replaces it (the usual Mac behaviour on click).
+                        DispatchQueue.main.async {
+                            NSApp.sendAction(#selector(NSText.selectAll(_:)), to: nil, from: nil)
+                        }
+                    }
                     .onChange(of: text) { newText in
                         let digits = String(newText.filter { $0.isASCII && $0.isNumber }.prefix(4))
                         if digits != newText { text = digits }
