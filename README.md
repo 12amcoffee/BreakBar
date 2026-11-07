@@ -171,8 +171,6 @@ System notifications are only sent when no window says the same thing (e.g. auto
 
 ## Integrations
 
-Most people won't need these, but they are there:
-
 - **Terminal:** `open breakbar://toggle`. Also `start`, `stop`, `startRest`, `startWork`, `snooze`, `skip`, `extend`, `pause`, `resume` and `resetSet`.
 - **Shortcuts app:** actions for Start timer, Stop timer, Start resting, Start working and Skip rest. Pair "Set Focus" with "Start timer" to turn on Do Not Disturb for each work session.
 - **Hotkeys** (Settings > General): one to start and stop, and one that answers the Rest or Start working window.
