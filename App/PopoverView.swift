@@ -10,6 +10,7 @@ struct PopoverView: View {
     @Environment(\.colorScheme) private var scheme
     @State private var hoveringMainButton = false
     @State private var openInterval: Interval?
+    @State private var editingNumber = false
 
     private var machine: TimerMachine { controller.machine }
     private var actions: AvailableActions { machine.available }
@@ -34,7 +35,7 @@ struct PopoverView: View {
 
             if hasActions { contextualActions }
 
-            IntervalsRow(controller: controller, palette: palette, open: $openInterval)
+            IntervalsRow(controller: controller, palette: palette, open: $openInterval, editingNumber: $editingNumber)
 
             Rectangle().fill(palette.line).frame(height: 1)
 
@@ -76,7 +77,7 @@ struct PopoverView: View {
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(BBButtonStyle(role: .primary, palette: palette, size: 13, fillWidth: true))
-        .defaultShortcut(openInterval == nil)      // Return belongs to the number box while it is open
+        .defaultShortcut(!editingNumber)           // Return belongs to the number box while you type in it
         .onHover { hoveringMainButton = $0 }
     }
 
@@ -150,6 +151,7 @@ private struct IntervalsRow: View {
     @ObservedObject var controller: TimerController
     let palette: BBPalette
     @Binding var open: Interval?
+    @Binding var editingNumber: Bool
 
     var body: some View {
         VStack(spacing: 8) {
@@ -177,12 +179,12 @@ private struct IntervalsRow: View {
             Spacer(minLength: 4)
             StepButton(systemName: "minus", label: "Decrease", palette: palette) { adjust(interval, by: -1) }
             NumberField(value: controller.binding(interval.keyPath), range: 1...180, width: 34,
-                        fill: palette.control, autoFocus: true)
+                        fill: palette.control) { editingNumber = $0 }
             Text("min").foregroundStyle(palette.secondaryText)
             StepButton(systemName: "plus", label: "Increase", palette: palette) { adjust(interval, by: 1) }
         }
         .padding(.horizontal, 4)
-        .id(interval)                                 // a fresh box (and focus) for each pill
+        .id(interval)                                 // a fresh box for each pill
     }
 
     private func adjust(_ interval: Interval, by delta: Int) {

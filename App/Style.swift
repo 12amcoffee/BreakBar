@@ -77,59 +77,73 @@ struct SessionDots: View {
     }
 }
 
-/// A small number box: click, type a value, press Return (or click away) to apply it.
-/// Only digits are accepted, and the value is clamped to `range` (the settings clamp it again on save).
+/// A number that looks like plain text. Hover to see it is editable (a box appears); click to type a value,
+/// then Return or click away to apply it, Esc to cancel. Only digits are accepted and the value is clamped
+/// to `range`. Nothing is focused until you click, so opening a window never lands the cursor here.
 struct NumberField: View {
     @Binding var value: Int
     let range: ClosedRange<Int>
     var width: CGFloat = 46
     var fill: Color = Color.primary.opacity(0.08)
-    var autoFocus = false
+    /// Told when typing starts and stops, so a window can keep Return away from its default button meanwhile.
+    var onEditing: ((Bool) -> Void)? = nil
+
+    @State private var editing = false
+    @State private var hovering = false
     @State private var text = ""
     @FocusState private var focused: Bool
 
+    private var shape: RoundedRectangle { RoundedRectangle(cornerRadius: 6, style: .continuous) }
+
     var body: some View {
-        TextField("", text: $text)
-            .textFieldStyle(.plain)
-            .multilineTextAlignment(.trailing)
-            .monospacedDigit()
-            .focused($focused)
-            .frame(width: width)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 3)
-            .background(fill, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .strokeBorder(Color.tomato, lineWidth: focused ? 1.5 : 0)
+        ZStack(alignment: .trailing) {
+            if editing {
+                TextField("", text: $text)
+                    .textFieldStyle(.plain)
+                    .multilineTextAlignment(.trailing)
+                    .monospacedDigit()
+                    .focused($focused)
+                    .onAppear { focused = true }
+                    .onChange(of: text) { newText in
+                        let digits = String(newText.filter { $0.isASCII && $0.isNumber }.prefix(4))
+                        if digits != newText { text = digits }
+                    }
+                    .onChange(of: focused) { isFocused in
+                        if !isFocused { finish(apply: true) }          // clicked away
+                    }
+                    .onSubmit { finish(apply: true) }
+                    .onExitCommand { finish(apply: false) }            // Esc cancels
+            } else {
+                Text(verbatim: String(value)).monospacedDigit()
             }
-            .onAppear {
-                text = String(value)
-                if autoFocus { focused = true }
-            }
-            .onChange(of: value) { newValue in
-                // The value also changes from the − / + buttons and from clamping: keep the box in step.
-                if Int(text) != newValue { text = String(newValue) }
-            }
-            .onChange(of: text) { newText in
-                let digits = String(newText.filter { $0.isASCII && $0.isNumber }.prefix(4))
-                if digits != newText { text = digits }
-            }
-            .onChange(of: focused) { isFocused in
-                if !isFocused { commit() }
-            }
-            .onSubmit {
-                commit()
-                focused = false
-            }
+        }
+        .frame(width: width, alignment: .trailing)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 3)
+        .background(hovering || editing ? fill : Color.clear, in: shape)
+        .overlay { shape.strokeBorder(Color.tomato, lineWidth: editing ? 1.5 : 0) }
+        .contentShape(shape)
+        .onHover { hovering = $0 }
+        .onTapGesture { beginEditing() }
+        .onDisappear { if editing { onEditing?(false) } }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
     }
 
-    private func commit() {
-        guard let typed = Int(text) else {
-            text = String(value)                      // empty or unreadable: put the old value back
-            return
-        }
-        let clamped = min(range.upperBound, max(range.lowerBound, typed))
-        if clamped != value { value = clamped }
-        text = String(clamped)
+    private func beginEditing() {
+        guard !editing else { return }
+        text = String(value)
+        editing = true
+        onEditing?(true)
+    }
+
+    private func finish(apply: Bool) {
+        guard editing else { return }
+        if apply, let typed = Int(text) {
+            let clamped = min(range.upperBound, max(range.lowerBound, typed))
+            if clamped != value { value = clamped }
+        }                                                              // empty or unreadable: keep the old value
+        editing = false
+        onEditing?(false)
     }
 }

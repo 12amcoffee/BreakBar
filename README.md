@@ -18,7 +18,7 @@ click **Start resting**.
 
 ## What's new in 2.0
 
-- **Intervals in the dropdown.** Work, short rest and long rest sit under the Start button as three pills; click one to adjust it with a stepper.
+- **Intervals in the dropdown.** Work, short rest and long rest sit under the Start button as three pills; click one to adjust it with a stepper, or click the number itself and type a value (Return applies, Esc cancels).
 - **Warm look.** Cream in light mode and ink in dark mode across the popover, Settings and the Rest windows, with flat tomato buttons.
 - **Redrawn Rest windows.** All four styles (small, maximised, banner, full screen) now show session dots, a rest countdown with a progress bar, and a "Break is over" window to start work. The full-screen overlay is a tomato screen in light mode and an ink screen in dark mode.
 - **Tidier popover.** The empty gap under "Session 1 of 4" is gone.
