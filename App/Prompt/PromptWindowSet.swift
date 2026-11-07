@@ -7,6 +7,15 @@ final class PromptPanel: NSPanel {
     var onEscape: (() -> Void)?
     override var canBecomeKey: Bool { true }
     override func cancelOperation(_ sender: Any?) { onEscape?() }
+
+    /// A borderless window does not turn Esc into `cancelOperation` by itself, so catch the key directly.
+    override func keyDown(with event: NSEvent) {
+        if event.keyCode == 53 {          // 53 = Esc
+            onEscape?()
+        } else {
+            super.keyDown(with: event)
+        }
+    }
 }
 
 /// The actual AppKit windows for one style: one panel, or one per display for the full-screen overlay.
@@ -62,7 +71,9 @@ final class PromptWindowSet {
                 panel.animator().alphaValue = 1
             }
         case .small:
-            panels.first?.orderFrontRegardless()          // does not steal keyboard focus while you type
+            // Key window (without activating BreakBar) so Esc works straight away. The cost: keys you were
+            // typing into another app when it appeared go to this window until you close it.
+            panels.first?.makeKeyAndOrderFront(nil)
         case .maximised, .fullScreen:
             NSApp.activate(ignoringOtherApps: true)       // so Esc works straight away
             panels.first?.makeKeyAndOrderFront(nil)

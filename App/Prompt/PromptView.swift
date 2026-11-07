@@ -91,8 +91,9 @@ struct PromptView: View {
         VStack(spacing: base * 0.6) {
             if spec.kind != .resting {
                 Button(primaryTitle) { h.primary() }
+                    // No Return-key shortcut here: a window that pops up while you type must not be
+                    // answered by a stray Return. Use the "answer window" hotkey for a keyboard route.
                     .buttonStyle(BBButtonStyle(role: .primary, palette: palette, size: base, fillWidth: true))
-                    .keyboardShortcut(.defaultAction)
             }
             HStack(spacing: base * 0.6) {
                 if let m = spec.snoozeMinutes { Button("Snooze \(m) min") { h.snooze() } }
